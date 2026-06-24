@@ -3,9 +3,9 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("== Control Flow ==")
+	fmt.Println("== Structs, Methods & Pointers ==")
 
-	loopsDemo()
-	fizzBuzzDemo()
-	ifAndSwitchDemo()
+	structsDemo()
+	pointersDemo()
+	embeddingDemo()
 }

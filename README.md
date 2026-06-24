@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 08-control-flow-start
+git checkout 09-structs-and-methods-start
 ```
 
-The start branch adds a new `control_flow.go` file with three demo functions — `loopsDemo`, `fizzBuzzDemo`, and `ifAndSwitchDemo` — whose bodies are stubbed out with `// TODO` comments. `main.go` prints the `== Control Flow ==` header and calls each demo. It still compiles and runs (`make run`), printing just the section headers, ready for you to fill in the loops, FizzBuzz, `if`, and `switch` code.
+The start branch adds two new files — `task.go` (defining the `Task` struct with `ID`, `Title`, and `Done`) and `structs.go` (the `structsDemo`, `pointersDemo`, and `embeddingDemo` functions) — with their method bodies and demo logic stubbed out with `// TODO` comments. `main.go` prints the `== Structs, Methods & Pointers ==` header and calls each demo. It still compiles and runs (`make run`), printing just the section headers, ready for you to fill in the struct, the value-receiver vs pointer-receiver methods, the pointer basics, and the embedding example.
 
 ## Finish Branch
 
 ```bash
-git checkout 08-control-flow-finish
+git checkout 09-structs-and-methods-finish
 ```
 
-The finish branch completes the control-flow examples: a three-clause `for` loop and a `for range` over a slice of task titles, a FizzBuzz loop (1–15) built on a condition-less `switch` with multiple-value cases, an `if avg, err := mathx.Average(...); err != nil` error check, and a `switch` on a status value with multiple values per case. `make run` prints real output.
+The finish branch completes the examples: a `Task` struct created three ways (a struct literal, `&Task{}`, and `new`), a read-only `Summary()` method on a **value receiver**, a `markDoneByValue` method that mutates a **copy** (so the change never sticks) contrasted with a `MarkDone()` method on a **pointer receiver** (so the change does stick), a pointer demo using `&` and `*` plus a nil `*Task`, and a `labeledTask` that **embeds** `Task` and calls its promoted method and field. `make run` prints real output that makes the value-vs-pointer contrast visible.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/control-flow)
+[View the lesson on dalabs.academy](<!-- dalabs:09-structs-and-methods -->)
 
 ## Running the Program
 
@@ -40,40 +40,28 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-On the finish branch, `make run` prints real control-flow output:
+On the finish branch, `make run` prints real output showing the value-vs-pointer contrast:
 
 ```
-== Control Flow ==
+== Structs, Methods & Pointers ==
 
--- Loops --
-count up: 1 2 3 4 5 
-task 0: write code
-task 1: run tests
-task 2: ship it
+-- Structs --
+#1 "write code" [open]
+#2 "run tests" [open]
+#3 "ship it" [open]
 
--- FizzBuzz --
-1
-2
-Fizz
-4
-Buzz
-Fizz
-7
-8
-Fizz
-Buzz
-11
-Fizz
-13
-14
-FizzBuzz
+-- Value vs Pointer Receiver --
+markDoneByValue set the copy to true, but...
+after markDoneByValue: #1 "write code" [open]
+after MarkDone:        #1 "write code" [done]
 
--- if & switch --
-average score: 8.0
-todo         -> still open
-in-progress  -> still open
-done         -> finished
-archived     -> unknown
+-- Pointers --
+count is now 42 (changed through the pointer)
+a nil *Task prints as: <nil>
+
+-- Embedding --
+#4 "review PR" [done] (label: urgent)
+promoted field Title: review PR
 ```
 
 > **Note:** The `Makefile` grows later in the course — a `test` target arrives with the testing section and a `migrate` target with database migrations. The same `make lint` runs in CI at the end of the course.
