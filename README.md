@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 07-functions-and-packages-start
+git checkout 08-control-flow-start
 ```
 
-The start branch sets up two new packages of our own — `mathx` and `textx` — each with exported functions stubbed out with `// TODO` comments. `main.go` prints the section headers with empty bodies, ready for you to fill in. It still compiles and runs (`make run`).
+The start branch adds a new `control_flow.go` file with three demo functions — `loopsDemo`, `fizzBuzzDemo`, and `ifAndSwitchDemo` — whose bodies are stubbed out with `// TODO` comments. `main.go` prints the `== Control Flow ==` header and calls each demo. It still compiles and runs (`make run`), printing just the section headers, ready for you to fill in the loops, FizzBuzz, `if`, and `switch` code.
 
 ## Finish Branch
 
 ```bash
-git checkout 07-functions-and-packages-finish
+git checkout 08-control-flow-finish
 ```
 
-The finish branch completes the packages: `mathx.MinMax` (variadic, named returns), `mathx.Average` (returns a value and an error), and `textx.Label` (uses the standard library plus the third-party `golang.org/x/text` package). `main.go` imports both packages by their full module path and prints real results.
+The finish branch completes the control-flow examples: a three-clause `for` loop and a `for range` over a slice of task titles, a FizzBuzz loop (1–15) built on a condition-less `switch` with multiple-value cases, an `if avg, err := mathx.Average(...); err != nil` error check, and a `switch` on a status value with multiple values per case. `make run` prints real output.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/functions-and-packages)
+[View the lesson on dalabs.academy](<!-- dalabs:08-control-flow -->)
 
 ## Running the Program
 
@@ -38,20 +38,6 @@ make fmt     # go fmt ./... -> formats the code
 make vet     # go vet ./... -> reports suspicious code
 make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
-```
-
-On the finish branch, `make run` prints real results from the two packages:
-
-```
-== Functions & Packages ==
-
--- Functions --
-MinMax(7, 2, 9, 4, 1) = 1, 9
-Average(7, 2, 9, 4, 1) = 4.60
-Average() error: mathx: no numbers given
-
--- Packages --
-Label("  go    backend   service  ") = "Go Backend Service"
 ```
 
 > **Note:** The `Makefile` grows later in the course — a `test` target arrives with the testing section and a `migrate` target with database migrations. The same `make lint` runs in CI at the end of the course.
