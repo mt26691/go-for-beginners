@@ -23,7 +23,7 @@ The start branch sets the stage for Go's concurrency tools. A new `concurrency.g
 git checkout 13-goroutines-and-concurrency-finish
 ```
 
-The finish branch completes the concurrency demo. `goroutinesDemo` launches one goroutine per worker with `go func()`, waits for all of them with a `sync.WaitGroup`, then prints a **sorted** summary so the output is stable across runs. `channelsDemo` sends a known number of values over an unbuffered channel and ranges over it to receive them, then shows a buffered channel accepting sends without a receiver. `SafeCounter` guards an `int` with a `sync.Mutex`, and `mutexCounterDemo` increments one counter from 100 goroutines at once — the final total is always exactly 100, with no data race. The whole program is race-free under `go run -race .`, and `make run` prints real, deterministic output.
+The finish branch completes the concurrency demo. `goroutinesDemo` launches one goroutine per worker with `go func()`, waits for all of them with a `sync.WaitGroup`, then prints a fixed-order summary (each goroutine writes into its own slice slot) so the output is stable across runs. `channelsDemo` sends a known number of values over an unbuffered channel and ranges over it to receive them, then shows a buffered channel accepting sends without a receiver. `SafeCounter` guards an `int` with a `sync.Mutex`, and `mutexCounterDemo` increments one counter from 100 goroutines at once — the final total is always exactly 100, with no data race. The whole program is race-free under `go run -race .`, and `make run` prints real, deterministic output.
 
 ## Lesson
 
@@ -46,7 +46,7 @@ To check the program for data races, run it with Go's built-in race detector:
 go run -race .
 ```
 
-> **Note:** On the start branch the `== Concurrency ==` section prints `(not implemented yet)` placeholder lines because the demo bodies and `SafeCounter` are stubbed. Fill in the `// TODO`s (or check out the finish branch) to see the goroutines launch and join through a `sync.WaitGroup`, values flow over a channel, and a `sync.Mutex` keep a shared counter correct under 100 concurrent goroutines.
+> **Note:** This is the finish branch, so the `== Concurrency ==` section is fully implemented. The goroutines launch and join through a `sync.WaitGroup`, values flow over an unbuffered and then a buffered channel, and a `sync.Mutex` keeps a shared `SafeCounter` correct under 100 concurrent goroutines — the final total is always exactly 100. The output is deterministic across runs, and `go run -race .` reports no data races.
 
 ## Contact
 
