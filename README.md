@@ -27,7 +27,7 @@ This branch completes the scaffold: each function declares and prints real varia
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:06-variables-and-types -->)
+[View the lesson on dalabs.academy]({URL})
 
 ## Using the Makefile
 
