@@ -40,14 +40,18 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-On the start branch, `make run` prints the section headers with empty bodies:
+On the finish branch, `make run` prints real results from the two packages:
 
 ```
 == Functions & Packages ==
 
 -- Functions --
+MinMax(7, 2, 9, 4, 1) = 1, 9
+Average(7, 2, 9, 4, 1) = 4.60
+Average() error: mathx: no numbers given
 
 -- Packages --
+Label("  go    backend   service  ") = "Go Backend Service"
 ```
 
 > **Note:** The `Makefile` grows later in the course — a `test` target arrives with the testing section and a `migrate` target with database migrations. The same `make lint` runs in CI at the end of the course.
