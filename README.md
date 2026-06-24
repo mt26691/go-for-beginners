@@ -34,6 +34,7 @@ The `main` branch contains the final, completed version of the entire course —
 | 02 | What Makes Go Different? | — | — |
 | 03 | What You Will Build | — | — |
 | 04 | Installing Go & Setting Up Your Environment | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/04-installing-go-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/04-installing-go-finish) |
+| 05 | Developer Tooling: Makefile & golangci-lint | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/05-developer-tooling-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/05-developer-tooling-finish) |
 
 ## Contact
 
