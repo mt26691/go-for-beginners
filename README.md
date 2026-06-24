@@ -40,6 +40,42 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
+On the finish branch, `make run` prints real control-flow output:
+
+```
+== Control Flow ==
+
+-- Loops --
+count up: 1 2 3 4 5 
+task 0: write code
+task 1: run tests
+task 2: ship it
+
+-- FizzBuzz --
+1
+2
+Fizz
+4
+Buzz
+Fizz
+7
+8
+Fizz
+Buzz
+11
+Fizz
+13
+14
+FizzBuzz
+
+-- if & switch --
+average score: 8.0
+todo         -> still open
+in-progress  -> still open
+done         -> finished
+archived     -> unknown
+```
+
 > **Note:** The `Makefile` grows later in the course — a `test` target arrives with the testing section and a `migrate` target with database migrations. The same `make lint` runs in CI at the end of the course.
 
 ## Contact

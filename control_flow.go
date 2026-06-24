@@ -1,37 +1,67 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
 
-// loopsDemo will show Go's single loop keyword, for: the three-clause form
-// and the for range form over a slice.
+	"github.com/mt26691/go-for-beginners/mathx"
+)
+
+// loopsDemo shows Go's single loop keyword, for: the classic three-clause
+// form and the for range form over a slice.
 func loopsDemo() {
 	fmt.Println("\n-- Loops --")
 
-	// TODO: write a three-clause for loop (for i := 1; i <= 5; i++) that
-	// prints the numbers 1 through 5.
+	fmt.Print("count up: ")
+	for i := 1; i <= 5; i++ {
+		fmt.Print(i, " ")
+	}
+	fmt.Println()
 
-	// TODO: range over a []string of task titles and print each index and
-	// value with `for i, title := range tasks`.
+	tasks := []string{"write code", "run tests", "ship it"}
+	for i, title := range tasks {
+		fmt.Printf("task %d: %s\n", i, title)
+	}
 }
 
-// fizzBuzzDemo will show a condition-less switch with multiple-value cases
-// using the classic FizzBuzz example.
+// fizzBuzzDemo shows a condition-less switch with multiple-value cases using
+// the classic FizzBuzz example. Each case is a boolean test, and Go breaks
+// out of the switch automatically after the first matching case.
 func fizzBuzzDemo() {
 	fmt.Println("\n-- FizzBuzz --")
 
-	// TODO: loop from 1 to 15 and use a `switch {` with no condition, where
-	// each case is a boolean test, to print Fizz / Buzz / FizzBuzz / the
-	// number.
+	for n := 1; n <= 15; n++ {
+		switch {
+		case n%15 == 0:
+			fmt.Println("FizzBuzz")
+		case n%3 == 0:
+			fmt.Println("Fizz")
+		case n%5 == 0:
+			fmt.Println("Buzz")
+		default:
+			fmt.Println(n)
+		}
+	}
 }
 
-// ifAndSwitchDemo will show the `if init; cond` form paired with an error
-// and a switch on a value with multiple values per case.
+// ifAndSwitchDemo shows the `if init; cond` form paired with an error and a
+// switch on a value with multiple values per case.
 func ifAndSwitchDemo() {
 	fmt.Println("\n-- if & switch --")
 
-	// TODO: use `if avg, err := mathx.Average(...); err != nil` to handle the
-	// error case, then print the average.
+	if avg, err := mathx.Average(8, 6, 10); err != nil {
+		fmt.Println("average error:", err)
+	} else {
+		fmt.Printf("average score: %.1f\n", avg)
+	}
 
-	// TODO: switch on a status string with multiple values per case
-	// (for example "todo", "in-progress", "done").
+	for _, status := range []string{"todo", "in-progress", "done", "archived"} {
+		switch status {
+		case "todo", "in-progress":
+			fmt.Printf("%-12s -> still open\n", status)
+		case "done":
+			fmt.Printf("%-12s -> finished\n", status)
+		default:
+			fmt.Printf("%-12s -> unknown\n", status)
+		}
+	}
 }
