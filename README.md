@@ -27,7 +27,7 @@ The finish branch completes the error model. `InMemoryStore.Find` returns the ta
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:12-errors -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/errors)
 
 ## Running the Program
 
