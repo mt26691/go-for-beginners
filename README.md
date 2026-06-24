@@ -42,6 +42,7 @@ The `main` branch contains the final, completed version of the entire course —
 | 10 | Slices and Maps | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/10-slices-and-maps-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/10-slices-and-maps-finish) |
 | 11 | Interfaces | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/11-interfaces-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/11-interfaces-finish) |
 | 12 | Errors Are Values | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/12-errors-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/12-errors-finish) |
+| 13 | Goroutines & Concurrency Basics | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/13-goroutines-and-concurrency-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/13-goroutines-and-concurrency-finish) |
 
 ## Contact
 
