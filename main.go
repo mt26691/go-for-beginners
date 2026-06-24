@@ -16,16 +16,18 @@ func main() {
 func variablesDemo() {
 	fmt.Println("\n-- Variables --")
 
-	// TODO: declare a variable with the long form `var`, e.g.
-	//   var language string = "Go"
-	// then print it.
+	// Short form: := declares and infers the type. Functions only.
+	language := "Go"
+	fmt.Println("language:", language)
 
-	// TODO: declare a variable with the short form `:=`, e.g.
-	//   year := 2009
-	// then print it.
+	// Long form with an explicit type, used when you want a type the
+	// right-hand side would not infer: 36 alone would be an int.
+	var temperature float64 = 36
+	fmt.Println("temperature:", temperature)
 
-	// TODO: reassign one of the variables above with `=` (no :=)
-	// and print it again to show declare vs assign.
+	// = assigns to an already-declared variable; := would be an error here.
+	language = "Golang"
+	fmt.Println("language (reassigned):", language)
 }
 
 // zeroValuesDemo shows that every variable starts at a sensible default
@@ -33,28 +35,57 @@ func variablesDemo() {
 func zeroValuesDemo() {
 	fmt.Println("\n-- Zero values --")
 
-	// TODO: declare an int, a float64, a string, and a bool with `var`
-	// but no initial value, then print each one to see its zero value
-	// (0, 0, "", false).
+	var count int
+	var ratio float64
+	var name string
+	var active bool
+
+	fmt.Printf("int:     %d\n", count)
+	fmt.Printf("float64: %g\n", ratio)
+	fmt.Printf("string:  %q\n", name)
+	fmt.Printf("bool:    %t\n", active)
 }
 
 // basicTypesDemo shows Go's common basic types and type inference.
 func basicTypesDemo() {
 	fmt.Println("\n-- Basic types --")
 
-	// TODO: declare values of a few basic types (int, int64, float64,
-	// string, bool) and print each with its type using %T, e.g.
-	//   fmt.Printf("%v has type %T\n", value, value)
+	count := 42 // int
+	var big int64 = 9_000_000_000
+	price := 19.99      // float64
+	greeting := "héllo" // string (UTF-8)
+	ready := true       // bool
 
-	// TODO: show a byte and a rune from a string and print them.
+	fmt.Printf("%-9v has type %T\n", count, count)
+	fmt.Printf("%-9v has type %T\n", big, big)
+	fmt.Printf("%-9v has type %T\n", price, price)
+	fmt.Printf("%-9q has type %T\n", greeting, greeting)
+	fmt.Printf("%-9v has type %T\n", ready, ready)
+
+	// Strings are UTF-8. "héllo" is 6 bytes but 5 runes because é
+	// takes two bytes. A byte (uint8) is one raw byte; a rune (int32)
+	// is one Unicode code point.
+	fmt.Printf("%q: %d bytes, %d runes\n",
+		greeting, len(greeting), len([]rune(greeting)))
 }
+
+// LogLevel is a small enumeration numbered by iota.
+type LogLevel int
+
+const (
+	LevelDebug LogLevel = iota // 0
+	LevelInfo                  // 1
+	LevelWarn                  // 2
+	LevelError                 // 3
+)
 
 // constantsDemo shows constants and a simple iota enumeration.
 func constantsDemo() {
 	fmt.Println("\n-- Constants --")
 
-	// TODO: declare a single const, e.g. const pi = 3.14159, and print it.
+	const pi = 3.14159
+	fmt.Println("pi:", pi)
 
-	// TODO: declare a const block that uses iota to number a few values
-	// (for example weekdays or log levels), then print them.
+	fmt.Printf("levels: debug=%d info=%d warn=%d error=%d\n",
+		LevelDebug, LevelInfo, LevelWarn, LevelError)
 }

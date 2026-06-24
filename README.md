@@ -40,6 +40,35 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
+On the finish branch, `make run` prints labeled output for each concept:
+
+```
+== Variables, Types & Constants ==
+
+-- Variables --
+language: Go
+temperature: 36
+language (reassigned): Golang
+
+-- Zero values --
+int:     0
+float64: 0
+string:  ""
+bool:    false
+
+-- Basic types --
+42        has type int
+9000000000 has type int64
+19.99     has type float64
+"héllo"   has type string
+true      has type bool
+"héllo": 6 bytes, 5 runes
+
+-- Constants --
+pi: 3.14159
+levels: debug=0 info=1 warn=2 error=3
+```
+
 > **Note:** The `Makefile` grows later in the course — a `test` target arrives with the testing section and a `migrate` target with database migrations. The same `make lint` runs in CI at the end of the course.
 
 ## Contact
