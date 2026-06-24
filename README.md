@@ -27,7 +27,7 @@ The finish branch completes `collections.go`: `slicesDemo` builds a `[]Task` wit
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:10-slices-and-maps -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/slices-and-maps)
 
 ## Running the Program
 
