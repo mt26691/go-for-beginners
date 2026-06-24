@@ -12,39 +12,32 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 05-developer-tooling-start
+git checkout 06-variables-and-types-start
 ```
 
-The start branch is the same working `Hello, Go!` program from Chapter 4 — no tooling yet.
+The start branch is a scaffold: `main.go` has four small functions (`variablesDemo`, `zeroValuesDemo`, `basicTypesDemo`, `constantsDemo`) with `// TODO` comments describing the variables, types, and constants you will add. It still compiles and runs — `make run` prints the section headers with empty bodies underneath, ready for you to fill in.
 
 ## Finish Branch
 
 ```bash
-git checkout 05-developer-tooling-finish
+git checkout 06-variables-and-types-finish
 ```
 
-This branch adds developer tooling around the program: a `Makefile` that wraps the commands you type constantly, and a `.golangci.yml` config for `golangci-lint`.
+This branch completes the scaffold: each function declares and prints real variables, shows zero values, demonstrates Go's basic types and type inference, and defines constants with an `iota` enumeration.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:05-developer-tooling -->)
+[View the lesson on dalabs.academy](<!-- dalabs:06-variables-and-types -->)
 
 ## Using the Makefile
 
 ```bash
-make run     # go run .   -> prints "Hello, Go!"
+make run     # go run .   -> runs the program
 make build   # go build   -> compiles the binary
 make fmt     # go fmt ./... -> formats the code
 make vet     # go vet ./... -> reports suspicious code
 make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
-```
-
-On the clean Hello-World program, `make fmt`, `make vet`, and `make lint` all pass with no issues:
-
-```
-golangci-lint run
-0 issues.
 ```
 
 > **Note:** The `Makefile` grows later in the course — a `test` target arrives with the testing section and a `migrate` target with database migrations. The same `make lint` runs in CI at the end of the course.
