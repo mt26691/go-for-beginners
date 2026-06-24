@@ -27,7 +27,7 @@ The finish branch completes the control-flow examples: a three-clause `for` loop
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:08-control-flow -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/control-flow)
 
 ## Running the Program
 
