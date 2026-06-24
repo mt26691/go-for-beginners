@@ -27,7 +27,7 @@ The finish branch completes the examples: a `Task` struct created three ways (a 
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:09-structs-and-methods -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/structs-and-methods)
 
 ## Running the Program
 
