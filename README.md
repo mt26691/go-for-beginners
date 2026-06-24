@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 12-errors-start
+git checkout 13-goroutines-and-concurrency-start
 ```
 
-The start branch sets the stage for Go's error model. `store.go` gains a sentinel error, `var ErrTaskNotFound = errors.New("task not found")`, and a new `Find(id int) (Task, error)` method is added to the `TaskStore` interface and both stores — but the `InMemoryStore.Find` body is stubbed with a `// TODO`. A new `errorsdemo.go` declares a custom `ValidationError` type, an `errorsDemo()` function, and three helpers (`loadTask`, `validateTitle`, `safeDivide`), all stubbed with `// TODO` comments that return `nil` or zero values. `main.go` adds a new `== Errors ==` section that calls `errorsDemo`. It compiles, vets, lints, and runs (`make run`) — printing the earlier sections, then the `Errors` header with placeholder `<nil>` lines — ready for you to fill in the sentinel lookup, the `%w` wrap, `errors.Is`/`errors.As`, and the `recover` example.
+The start branch sets the stage for Go's concurrency tools. A new `concurrency.go` declares `concurrencyDemo()` and three sub-demos — `goroutinesDemo`, `channelsDemo`, and `mutexCounterDemo` — plus a `SafeCounter` type whose `Inc`/`Value` methods and counter field are stubbed with `// TODO` comments. `main.go` adds a new `== Concurrency ==` section that calls `concurrencyDemo`. It compiles, vets, lints, and runs (`make run`) — printing the earlier sections, then the `Concurrency` header with `(not implemented yet)` placeholder lines — ready for you to add the `go func()` + `sync.WaitGroup` launch, the channel send/receive, and the `sync.Mutex`-protected counter.
 
 ## Finish Branch
 
 ```bash
-git checkout 12-errors-finish
+git checkout 13-goroutines-and-concurrency-finish
 ```
 
-The finish branch completes the error model. `InMemoryStore.Find` returns the task when present and `ErrTaskNotFound` when it is missing — the sentinel the HTTP layer maps to a 404 later in the course. `loadTask` wraps `ErrTaskNotFound` with `fmt.Errorf("...: %w", ...)` so callers can still unwrap it; `errorsDemo` prints the wrapped chain and uses `errors.Is` to find the sentinel through the wrap. `validateTitle` returns a `*ValidationError`, recovered at the call site with `errors.As`. `safeDivide` uses `defer`/`recover` to turn a divide-by-zero panic into a returned error, so the program stays green. `make run` prints real, deterministic output.
+The finish branch completes the concurrency demo. `goroutinesDemo` launches one goroutine per worker with `go func()`, waits for all of them with a `sync.WaitGroup`, then prints a **sorted** summary so the output is stable across runs. `channelsDemo` sends a known number of values over an unbuffered channel and ranges over it to receive them, then shows a buffered channel accepting sends without a receiver. `SafeCounter` guards an `int` with a `sync.Mutex`, and `mutexCounterDemo` increments one counter from 100 goroutines at once — the final total is always exactly 100, with no data race. The whole program is race-free under `go run -race .`, and `make run` prints real, deterministic output.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/errors)
+[View the lesson on dalabs.academy](<!-- dalabs:13-goroutines-and-concurrency -->)
 
 ## Running the Program
 
@@ -40,7 +40,13 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** On the start branch the `== Errors ==` section prints placeholder `<nil>` lines because the helper bodies are stubbed. Fill in the `// TODO`s (or check out the finish branch) to see the wrapped error, `errors.Is` matching `ErrTaskNotFound` through a wrap, `errors.As` extracting the `ValidationError`, and `recover` turning a panic into an error.
+To check the program for data races, run it with Go's built-in race detector:
+
+```bash
+go run -race .
+```
+
+> **Note:** On the start branch the `== Concurrency ==` section prints `(not implemented yet)` placeholder lines because the demo bodies and `SafeCounter` are stubbed. Fill in the `// TODO`s (or check out the finish branch) to see the goroutines launch and join through a `sync.WaitGroup`, values flow over a channel, and a `sync.Mutex` keep a shared counter correct under 100 concurrent goroutines.
 
 ## Contact
 

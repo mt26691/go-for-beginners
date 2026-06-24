@@ -22,4 +22,8 @@ func main() {
 	fmt.Println("\n== Errors ==")
 
 	errorsDemo()
+
+	fmt.Println("\n== Concurrency ==")
+
+	concurrencyDemo()
 }
