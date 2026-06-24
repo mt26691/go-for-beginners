@@ -14,13 +14,13 @@ This repository contains the source code for the [Go Programming for Beginners: 
 git checkout 04-installing-go-start
 ```
 
-You start with an empty Go module: a `go.mod` and a `main.go` that does nothing yet. Your job in this chapter is to write your first program.
-
 ## Finish Branch
 
 ```bash
 git checkout 04-installing-go-finish
 ```
+
+This branch adds your first program: a `main.go` that prints `Hello, Go!`. It confirms the Go toolchain is installed and working end to end.
 
 ## Lesson
 
@@ -32,7 +32,20 @@ git checkout 04-installing-go-finish
 go run .
 ```
 
-> **Note:** On the start branch `main` is empty, so `go run .` compiles and exits without printing anything. The finish branch prints `Hello, Go!`.
+This prints:
+
+```
+Hello, Go!
+```
+
+You can also compile it to a standalone binary and run that:
+
+```bash
+go build
+./go-for-beginners
+```
+
+> **Note:** The compiled binary is named after the module (`go-for-beginners`) and is gitignored, so it never gets committed.
 
 ## Contact
 
