@@ -50,10 +50,15 @@ func (s *InMemoryStore) Get(id int) (Task, bool) {
 	return t, ok
 }
 
-// Find looks a task up by ID and returns an error instead of a bool.
-// TODO: return the task when present, and ErrTaskNotFound when it is missing.
+// Find looks a task up by ID and returns an error instead of a bool. When the
+// id is missing it returns the sentinel ErrTaskNotFound, which callers match
+// with errors.Is and the HTTP layer later maps to a 404.
 func (s *InMemoryStore) Find(id int) (Task, error) {
-	return Task{}, nil
+	t, ok := s.tasks[id]
+	if !ok {
+		return Task{}, ErrTaskNotFound
+	}
+	return t, nil
 }
 
 // All returns every task sorted by ID so the output is deterministic. Map

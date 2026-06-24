@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -12,10 +13,9 @@ type ValidationError struct {
 	Msg   string
 }
 
-// Error makes ValidationError satisfy the error interface.
-// TODO: format Field and Msg into a readable message.
+// Error makes *ValidationError satisfy the error interface.
 func (e *ValidationError) Error() string {
-	return ""
+	return fmt.Sprintf("%s: %s", e.Field, e.Msg)
 }
 
 // errorsDemo shows the Go error model: returning and checking errors, wrapping
@@ -24,46 +24,62 @@ func (e *ValidationError) Error() string {
 func errorsDemo() {
 	fmt.Println("\n-- Errors --")
 
-	// TODO: call loadTask(99), print the wrapped error, and show errors.Is
-	// finding ErrTaskNotFound through the wrap.
-	_, err := loadTask(99)
-	fmt.Println("loadTask(99):", err)
+	// loadTask wraps ErrTaskNotFound with context using %w. Printing the error
+	// shows the whole chain; errors.Is still finds the sentinel underneath.
+	if _, err := loadTask(99); err != nil {
+		fmt.Println("loadTask(99) failed:", err)
+		fmt.Println("  errors.Is(err, ErrTaskNotFound):", errors.Is(err, ErrTaskNotFound))
+	}
 
-	// TODO: validate an empty title and use errors.As to pull the
-	// *ValidationError back out for its Field and Msg.
-	err = validateTitle("")
-	fmt.Println("validateTitle(\"\"):", err)
+	// validateTitle returns a *ValidationError. errors.As copies it back out so
+	// we can read its Field and Msg, even if it were wrapped further.
+	err := validateTitle("")
+	var ve *ValidationError
+	if errors.As(err, &ve) {
+		fmt.Printf("validation failed on field %q: %s\n", ve.Field, ve.Msg)
+	}
 
-	// TODO: look a missing task up in the store and show
-	// errors.Is(err, ErrTaskNotFound).
+	// The store now returns ErrTaskNotFound directly for a missing id — this is
+	// the lookup the HTTP layer maps to a 404 later in the course.
 	store := NewInMemoryStore()
-	_, err = store.Find(1)
-	fmt.Println("store.Find(1):", err)
+	if _, err := store.Find(1); errors.Is(err, ErrTaskNotFound) {
+		fmt.Println("store.Find(1): task not found (sentinel matched)")
+	}
 
-	// TODO: call safeDivide(10, 0) to show recover turning a panic into an error.
-	_, err = safeDivide(10, 0)
-	fmt.Println("safeDivide(10, 0):", err)
+	// safeDivide turns a divide-by-zero panic into a returned error, so a bug in
+	// one place does not crash the whole program.
+	if _, err := safeDivide(10, 0); err != nil {
+		fmt.Println("safeDivide(10, 0) recovered:", err)
+	}
 }
 
 // loadTask pretends to read a task from somewhere that can fail, then wraps the
-// failure with context using %w so callers can still unwrap it.
-// TODO: wrap ErrTaskNotFound with fmt.Errorf and %w.
+// failure with context using %w so callers can still unwrap it with errors.Is.
 func loadTask(id int) (Task, error) {
-	return Task{}, nil
+	store := NewInMemoryStore()
+	t, err := store.Find(id)
+	if err != nil {
+		return Task{}, fmt.Errorf("load task %d: %w", id, err)
+	}
+	return t, nil
 }
 
 // validateTitle returns a *ValidationError when the title is empty.
-// TODO: return a *ValidationError for an empty title, nil otherwise.
 func validateTitle(title string) error {
+	if title == "" {
+		return &ValidationError{Field: "title", Msg: "must not be empty"}
+	}
 	return nil
 }
 
 // safeDivide recovers from a divide-by-zero panic and returns it as an error, so
-// a bug in one place does not crash the whole program.
-// TODO: actually divide a by b inside a deferred recover so b == 0 returns an
-// error instead of crashing. For now it returns zero values so make run stays green.
+// a bug in one place does not crash the whole program. The named return err is
+// set inside the deferred recover.
 func safeDivide(a, b int) (result int, err error) {
-	_ = a
-	_ = b
-	return 0, nil
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("recovered from panic: %v", r)
+		}
+	}()
+	return a / b, nil
 }
