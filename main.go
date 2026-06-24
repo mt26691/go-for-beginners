@@ -8,4 +8,10 @@ func main() {
 	structsDemo()
 	pointersDemo()
 	embeddingDemo()
+
+	fmt.Println("\n== Slices & Maps ==")
+
+	slicesDemo()
+	mapsDemo()
+	nilMapDemo()
 }

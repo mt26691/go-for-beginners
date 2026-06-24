@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 09-structs-and-methods-start
+git checkout 10-slices-and-maps-start
 ```
 
-The start branch adds two new files — `task.go` (defining the `Task` struct with `ID`, `Title`, and `Done`) and `structs.go` (the `structsDemo`, `pointersDemo`, and `embeddingDemo` functions) — with their method bodies and demo logic stubbed out with `// TODO` comments. `main.go` prints the `== Structs, Methods & Pointers ==` header and calls each demo. It still compiles and runs (`make run`), printing just the section headers, ready for you to fill in the struct, the value-receiver vs pointer-receiver methods, the pointer basics, and the embedding example.
+The start branch adds `collections.go` with three demo functions — `slicesDemo`, `mapsDemo`, and `nilMapDemo` — whose bodies are stubbed out with `// TODO` comments (each prints only its section header). `main.go` keeps the structs demos from Chapter 9 and adds a new `== Slices & Maps ==` section that calls the three new demos. It still compiles and runs (`make run`), printing the structs output followed by the empty `Slices`, `Maps`, and `Nil maps` headers — ready for you to fill in slices (`make`/`append`, `len`/`cap`, slice expressions, ranging, and the aliasing gotcha), maps (literals, the comma-ok idiom, `delete`, sorted-key iteration), and the nil-map read-vs-write trap.
 
 ## Finish Branch
 
 ```bash
-git checkout 09-structs-and-methods-finish
+git checkout 10-slices-and-maps-finish
 ```
 
-The finish branch completes the examples: a `Task` struct created three ways (a struct literal, `&Task{}`, and `new`), a read-only `Summary()` method on a **value receiver**, a `markDoneByValue` method that mutates a **copy** (so the change never sticks) contrasted with a `MarkDone()` method on a **pointer receiver** (so the change does stick), a pointer demo using `&` and `*` plus a nil `*Task`, and a `labeledTask` that **embeds** `Task` and calls its promoted method and field. `make run` prints real output that makes the value-vs-pointer contrast visible.
+The finish branch completes `collections.go`: `slicesDemo` builds a `[]Task` with `make` and `append`, prints `len` and `cap`, takes a slice expression (`tasks[1:3]`), ranges over it, and makes the **aliasing** trap visible — two slices that share a backing array, where a write through one shows up through the other. `mapsDemo` builds a `map[int]Task` keyed by ID (the shape of the in-memory store you build in Chapter 20), looks tasks up with the **comma-ok** idiom for a present and an absent key, `delete`s one, and iterates in **sorted-key order** because map iteration order is unspecified. `nilMapDemo` shows that reading a nil map returns the zero value safely (a write would panic). `make run` prints real, deterministic output.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/structs-and-methods)
+[View the lesson on dalabs.academy](<!-- dalabs:10-slices-and-maps -->)
 
 ## Running the Program
 
@@ -40,31 +40,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-On the finish branch, `make run` prints real output showing the value-vs-pointer contrast:
-
-```
-== Structs, Methods & Pointers ==
-
--- Structs --
-#1 "write code" [open]
-#2 "run tests" [open]
-#3 "ship it" [open]
-
--- Value vs Pointer Receiver --
-markDoneByValue set the copy to true, but...
-after markDoneByValue: #1 "write code" [open]
-after MarkDone:        #1 "write code" [done]
-
--- Pointers --
-count is now 42 (changed through the pointer)
-a nil *Task prints as: <nil>
-
--- Embedding --
-#4 "review PR" [done] (label: urgent)
-promoted field Title: review PR
-```
-
-> **Note:** The `Makefile` grows later in the course — a `test` target arrives with the testing section and a `migrate` target with database migrations. The same `make lint` runs in CI at the end of the course.
+> **Note:** On the start branch the `Slices`, `Maps`, and `Nil maps` sections print only their headers — the demo bodies are stubbed with `// TODO`. Check out the finish branch to see the completed output.
 
 ## Contact
 
