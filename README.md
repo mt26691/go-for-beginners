@@ -35,6 +35,7 @@ The `main` branch contains the final, completed version of the entire course —
 | 03 | What You Will Build | — | — |
 | 04 | Installing Go & Setting Up Your Environment | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/04-installing-go-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/04-installing-go-finish) |
 | 05 | Developer Tooling: Makefile & golangci-lint | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/05-developer-tooling-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/05-developer-tooling-finish) |
+| 06 | Variables, Types & Constants | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/06-variables-and-types-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/06-variables-and-types-finish) |
 
 ## Contact
 
