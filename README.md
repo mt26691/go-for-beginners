@@ -1,2 +1,42 @@
-# go-for-beginners
-go-for-beginners
+# Go Programming for Beginners: Build Real Backend Services
+
+This repository contains the source code for the [Go Programming for Beginners: Build Real Backend Services](https://dalabs.academy) course.
+
+## Prerequisites
+
+- [Go](https://go.dev/dl/) 1.22 or newer (this repo was built with Go 1.26)
+- Basic programming experience in any language (variables, loops, functions)
+- Comfort using a terminal and a code editor (VS Code with the Go extension recommended)
+- [Git](https://git-scm.com/) installed
+
+## Course Repository
+
+All of the source code for this course is available on GitHub:
+
+https://github.com/mt26691/go-for-beginners
+
+Each chapter has two branches — a **start** branch and a **finish** branch — so you can easily follow along or jump to any point in the course. The branch naming convention follows this pattern:
+
+- `04-installing-go-start` — the starting point for Chapter 4, before any changes are made.
+- `04-installing-go-finish` — the completed state of Chapter 4, with all the code we wrote during that chapter.
+
+If you ever get stuck or want to compare your work, just checkout the **finish** branch for that chapter. And if you want to skip ahead or start fresh from a specific chapter, checkout the corresponding **start** branch.
+
+The `main` branch contains the final, completed version of the entire course — the end result of everything we'll build together.
+
+> **Note:** Chapters 1–3 are concept-only (no code), so they have no branches. The companion code starts at Chapter 4.
+
+## Chapters
+
+| # | Chapter | Lesson | Branches |
+|---|---------|--------|----------|
+| 01 | Why Learn Go? | — | — |
+| 02 | What Makes Go Different? | — | — |
+| 03 | What You Will Build | — | — |
+| 04 | Installing Go & Setting Up Your Environment | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/04-installing-go-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/04-installing-go-finish) |
+
+## Contact
+
+If you have any questions, feedback, or just want to connect, feel free to reach out to me on LinkedIn:
+
+https://www.linkedin.com/in/mt26691/
