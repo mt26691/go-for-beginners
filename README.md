@@ -27,7 +27,7 @@ The finish branch completes `store.go` and `interfaces.go`. `InMemoryStore` assi
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:11-interfaces -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/interfaces)
 
 ## Running the Program
 
