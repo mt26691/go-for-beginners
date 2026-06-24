@@ -12,24 +12,24 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 06-variables-and-types-start
+git checkout 07-functions-and-packages-start
 ```
 
-The start branch is a scaffold: `main.go` has four small functions (`variablesDemo`, `zeroValuesDemo`, `basicTypesDemo`, `constantsDemo`) with `// TODO` comments describing the variables, types, and constants you will add. It still compiles and runs — `make run` prints the section headers with empty bodies underneath, ready for you to fill in.
+The start branch sets up two new packages of our own — `mathx` and `textx` — each with exported functions stubbed out with `// TODO` comments. `main.go` prints the section headers with empty bodies, ready for you to fill in. It still compiles and runs (`make run`).
 
 ## Finish Branch
 
 ```bash
-git checkout 06-variables-and-types-finish
+git checkout 07-functions-and-packages-finish
 ```
 
-This branch completes the scaffold: each function declares and prints real variables, shows zero values, demonstrates Go's basic types and type inference, and defines constants with an `iota` enumeration.
+The finish branch completes the packages: `mathx.MinMax` (variadic, named returns), `mathx.Average` (returns a value and an error), and `textx.Label` (uses the standard library plus the third-party `golang.org/x/text` package). `main.go` imports both packages by their full module path and prints real results.
 
 ## Lesson
 
-[View the lesson on dalabs.academy]({URL})
+[View the lesson on dalabs.academy](<!-- dalabs:07-functions-and-packages -->)
 
-## Using the Makefile
+## Running the Program
 
 ```bash
 make run     # go run .   -> runs the program
@@ -40,33 +40,14 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-On the finish branch, `make run` prints labeled output for each concept:
+On the start branch, `make run` prints the section headers with empty bodies:
 
 ```
-== Variables, Types & Constants ==
+== Functions & Packages ==
 
--- Variables --
-language: Go
-temperature: 36
-language (reassigned): Golang
+-- Functions --
 
--- Zero values --
-int:     0
-float64: 0
-string:  ""
-bool:    false
-
--- Basic types --
-42        has type int
-9000000000 has type int64
-19.99     has type float64
-"héllo"   has type string
-true      has type bool
-"héllo": 6 bytes, 5 runes
-
--- Constants --
-pi: 3.14159
-levels: debug=0 info=1 warn=2 error=3
+-- Packages --
 ```
 
 > **Note:** The `Makefile` grows later in the course — a `test` target arrives with the testing section and a `migrate` target with database migrations. The same `make lint` runs in CI at the end of the course.
