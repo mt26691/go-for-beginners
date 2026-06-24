@@ -38,6 +38,7 @@ The `main` branch contains the final, completed version of the entire course —
 | 06 | Variables, Types & Constants | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/06-variables-and-types-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/06-variables-and-types-finish) |
 | 07 | Functions & Packages | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/07-functions-and-packages-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/07-functions-and-packages-finish) |
 | 08 | Control Flow: if, for, and switch | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/08-control-flow-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/08-control-flow-finish) |
+| 09 | Structs, Methods & Pointers | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/09-structs-and-methods-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/09-structs-and-methods-finish) |
 
 ## Contact
 
