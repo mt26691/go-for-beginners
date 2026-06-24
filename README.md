@@ -40,7 +40,36 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** On the start branch the `Slices`, `Maps`, and `Nil maps` sections print only their headers — the demo bodies are stubbed with `// TODO`. Check out the finish branch to see the completed output.
+On the finish branch, `make run` prints real, deterministic output (the Chapter 9 structs section, then the new slices and maps section):
+
+```
+== Slices & Maps ==
+
+-- Slices --
+len=3 cap=4 after three appends
+  tasks[0] = #1 "write code" [open]
+  tasks[1] = #2 "run tests" [open]
+  tasks[2] = #3 "ship it" [open]
+middle := tasks[1:3] -> len=2 cap=3
+after middle[0].Title = ...:
+  tasks[1] = #2 "RUN TESTS (edited via middle)" [open]
+  middle[0] = #2 "RUN TESTS (edited via middle)" [open]
+
+-- Maps --
+found id 2: #2 "run tests" [open]
+id 99 is not in the map (comma-ok said so)
+after delete(byID, 4): 3 tasks remain
+tasks in sorted-key order:
+  1 -> #1 "write code" [open]
+  2 -> #2 "run tests" [open]
+  3 -> #3 "ship it" [done]
+
+-- Nil maps --
+read from nil map: ok=false, value={ID:0 Title: Done:false}
+writing to a nil map would panic; make() the map first
+```
+
+> **Note:** The slices output makes the aliasing trap visible — `tasks[1]` and `middle[0]` both change because the slice expression `tasks[1:3]` shares the same backing array. The maps section iterates by **sorted keys** on purpose: Go's map iteration order is unspecified, so ranging in raw order would not be reproducible.
 
 ## Contact
 
