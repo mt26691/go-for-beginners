@@ -31,21 +31,27 @@ func NewInMemoryStore() *InMemoryStore {
 
 // Add assigns the next ID, stores the task, and returns the stored copy.
 func (s *InMemoryStore) Add(t Task) Task {
-	// TODO: increment s.nextID, set t.ID to it, store t in s.tasks, return t.
 	s.nextID++
+	t.ID = s.nextID
+	s.tasks[t.ID] = t
 	return t
 }
 
 // Get looks a task up by ID using the comma-ok idiom.
 func (s *InMemoryStore) Get(id int) (Task, bool) {
-	// TODO: read s.tasks[id] with comma-ok and return (task, ok).
-	return Task{}, false
+	t, ok := s.tasks[id]
+	return t, ok
 }
 
-// All returns every task sorted by ID so the output is deterministic.
+// All returns every task sorted by ID so the output is deterministic. Map
+// iteration order is unspecified, so we sort before returning.
 func (s *InMemoryStore) All() []Task {
-	// TODO: collect s.tasks into a slice, sort it by ID with sort.Slice, return it.
-	return nil
+	out := make([]Task, 0, len(s.tasks))
+	for _, t := range s.tasks {
+		out = append(out, t)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out
 }
 
 // LoggingStore wraps another TaskStore and logs every call before delegating.
@@ -60,29 +66,41 @@ func NewLoggingStore(inner TaskStore, out io.Writer) *LoggingStore {
 	return &LoggingStore{inner: inner, out: out}
 }
 
-// Add logs the call, then delegates to the wrapped store.
+// Add logs the call, then delegates to the wrapped store. Writing to s.out can
+// fail, so we discard the error with _ — fine for a demo log, but Chapter 12
+// shows when you must check it.
 func (s *LoggingStore) Add(t Task) Task {
-	// TODO: write a log line to s.out, then return s.inner.Add(t).
+	_, _ = fmt.Fprintf(s.out, "  [log] Add(%q)\n", t.Title)
 	return s.inner.Add(t)
 }
 
 // Get logs the call, then delegates to the wrapped store.
 func (s *LoggingStore) Get(id int) (Task, bool) {
-	// TODO: write a log line to s.out, then return s.inner.Get(id).
+	_, _ = fmt.Fprintf(s.out, "  [log] Get(%d)\n", id)
 	return s.inner.Get(id)
 }
 
 // All logs the call, then delegates to the wrapped store.
 func (s *LoggingStore) All() []Task {
-	// TODO: write a log line to s.out, then return s.inner.All().
+	_, _ = fmt.Fprintln(s.out, "  [log] All()")
 	return s.inner.All()
 }
 
 // runStore takes the TaskStore interface, not a concrete type, so it works with
-// any implementation. We call it with both stores to prove they are swappable.
+// any implementation. interfacesDemo calls it with both stores unchanged.
 func runStore(s TaskStore) {
-	// TODO: Add two tasks, Get one present and one absent, print s.All().
-	_ = s
-	_ = sort.Ints
-	_ = fmt.Sprint
+	s.Add(Task{Title: "write code"})
+	s.Add(Task{Title: "ship it"})
+
+	if t, ok := s.Get(1); ok {
+		fmt.Println("  Get(1):", t)
+	}
+	if _, ok := s.Get(99); !ok {
+		fmt.Println("  Get(99): not found")
+	}
+
+	fmt.Println("  All():")
+	for _, t := range s.All() {
+		fmt.Println("   ", t)
+	}
 }

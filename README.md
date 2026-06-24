@@ -40,7 +40,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** On the start branch the `Interfaces` section prints only its header and a placeholder line — the two stores, `runStore`, and `describe` are stubbed with `// TODO`. Check out the finish branch to see the completed output where the same `runStore` runs against both stores.
+> **Note:** On the finish branch `make run` prints real, deterministic output. The `Interfaces` section runs the same `runStore(s TaskStore)` function against an `InMemoryStore` and a `LoggingStore` and gets the same results — the swappable seam. `All()` sorts by ID so the output never changes between runs, and `LoggingStore` interleaves its `[log]` lines to show the wrapper satisfying the same interface.
 
 ## Contact
 
