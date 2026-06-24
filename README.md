@@ -27,7 +27,7 @@ The finish branch completes the concurrency demo. `goroutinesDemo` launches one 
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:13-goroutines-and-concurrency -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/goroutines-and-concurrency)
 
 ## Running the Program
 
