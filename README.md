@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 10-slices-and-maps-start
+git checkout 11-interfaces-start
 ```
 
-The start branch adds `collections.go` with three demo functions — `slicesDemo`, `mapsDemo`, and `nilMapDemo` — whose bodies are stubbed out with `// TODO` comments (each prints only its section header). `main.go` keeps the structs demos from Chapter 9 and adds a new `== Slices & Maps ==` section that calls the three new demos. It still compiles and runs (`make run`), printing the structs output followed by the empty `Slices`, `Maps`, and `Nil maps` headers — ready for you to fill in slices (`make`/`append`, `len`/`cap`, slice expressions, ranging, and the aliasing gotcha), maps (literals, the comma-ok idiom, `delete`, sorted-key iteration), and the nil-map read-vs-write trap.
+The start branch adds two new files. `store.go` defines the `TaskStore` interface (`Add`, `Get`, `All`) and two types that will satisfy it — an `InMemoryStore` backed by a `map[int]Task` and a `LoggingStore` that wraps another `TaskStore` — but their method bodies are stubbed with `// TODO` comments (they return zero values or just delegate). `interfaces.go` defines `interfacesDemo` and a `describe(any)` helper, also stubbed. `task.go` gains a `String()` method so `Task` satisfies `fmt.Stringer`. `main.go` adds a new `== Interfaces ==` section that calls `interfacesDemo`. It compiles, vets, lints, and runs (`make run`) — printing the structs and slices/maps output, then the `Interfaces` header — ready for you to fill in the two stores, `runStore`, the type switch in `describe`, and the empty-interface example.
 
 ## Finish Branch
 
 ```bash
-git checkout 10-slices-and-maps-finish
+git checkout 11-interfaces-finish
 ```
 
-The finish branch completes `collections.go`: `slicesDemo` builds a `[]Task` with `make` and `append`, prints `len` and `cap`, takes a slice expression (`tasks[1:3]`), ranges over it, and makes the **aliasing** trap visible — two slices that share a backing array, where a write through one shows up through the other. `mapsDemo` builds a `map[int]Task` keyed by ID (the shape of the in-memory store you build in Chapter 20), looks tasks up with the **comma-ok** idiom for a present and an absent key, `delete`s one, and iterates in **sorted-key order** because map iteration order is unspecified. `nilMapDemo` shows that reading a nil map returns the zero value safely (a write would panic). `make run` prints real, deterministic output.
+The finish branch completes `store.go` and `interfaces.go`. `InMemoryStore` assigns IDs and stores tasks in its map; its `All()` returns a snapshot **sorted by ID** so the output is deterministic. `LoggingStore` logs each call to an `io.Writer`, then delegates to the wrapped store — proving a wrapper can satisfy the same interface. `runStore(s TaskStore)` takes the **interface**, not a concrete type, and is called with both stores unchanged (the swappable seam this whole backend hangs on). `interfacesDemo` also shows a **type assertion**, a **type switch** (in `describe`), and the empty interface `any`. `Task` satisfies `fmt.Stringer` via `String()`. `make run` prints real, deterministic output.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/slices-and-maps)
+[View the lesson on dalabs.academy](<!-- dalabs:11-interfaces -->)
 
 ## Running the Program
 
@@ -40,36 +40,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-On the finish branch, `make run` prints real, deterministic output (the Chapter 9 structs section, then the new slices and maps section):
-
-```
-== Slices & Maps ==
-
--- Slices --
-len=3 cap=4 after three appends
-  tasks[0] = #1 "write code" [open]
-  tasks[1] = #2 "run tests" [open]
-  tasks[2] = #3 "ship it" [open]
-middle := tasks[1:3] -> len=2 cap=3
-after middle[0].Title = ...:
-  tasks[1] = #2 "RUN TESTS (edited via middle)" [open]
-  middle[0] = #2 "RUN TESTS (edited via middle)" [open]
-
--- Maps --
-found id 2: #2 "run tests" [open]
-id 99 is not in the map (comma-ok said so)
-after delete(byID, 4): 3 tasks remain
-tasks in sorted-key order:
-  1 -> #1 "write code" [open]
-  2 -> #2 "run tests" [open]
-  3 -> #3 "ship it" [done]
-
--- Nil maps --
-read from nil map: ok=false, value={ID:0 Title: Done:false}
-writing to a nil map would panic; make() the map first
-```
-
-> **Note:** The slices output makes the aliasing trap visible — `tasks[1]` and `middle[0]` both change because the slice expression `tasks[1:3]` shares the same backing array. The maps section iterates by **sorted keys** on purpose: Go's map iteration order is unspecified, so ranging in raw order would not be reproducible.
+> **Note:** On the start branch the `Interfaces` section prints only its header and a placeholder line — the two stores, `runStore`, and `describe` are stubbed with `// TODO`. Check out the finish branch to see the completed output where the same `runStore` runs against both stores.
 
 ## Contact
 

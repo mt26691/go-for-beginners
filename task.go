@@ -22,6 +22,13 @@ func (t Task) Summary() string {
 	return fmt.Sprintf("#%d %q [%s]", t.ID, t.Title, status)
 }
 
+// String makes Task satisfy fmt.Stringer: any type with a String() string method
+// controls how it prints with %v, %s, and the Print functions. We reuse Summary
+// so a Task prints the same one-line form everywhere.
+func (t Task) String() string {
+	return t.Summary()
+}
+
 // markDoneByValue tries to mark the task done through a value receiver. The
 // receiver is a copy, so flipping Done here changes only the copy and the
 // caller's task is untouched. This is the classic beginner trap. It returns the

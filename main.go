@@ -14,4 +14,8 @@ func main() {
 	slicesDemo()
 	mapsDemo()
 	nilMapDemo()
+
+	fmt.Println("\n== Interfaces ==")
+
+	interfacesDemo()
 }
