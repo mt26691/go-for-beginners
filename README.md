@@ -5,26 +5,29 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Prerequisites
 
 - [Go](https://go.dev/dl/) 1.22 or newer (this repo was built with Go 1.26)
+- [golangci-lint](https://golangci-lint.run/) (install with `brew install golangci-lint`)
 - Comfort using a terminal and a code editor (VS Code with the Go extension recommended)
 - [Git](https://git-scm.com/) installed
 
 ## Start Branch
 
 ```bash
-git checkout 04-installing-go-start
+git checkout 05-developer-tooling-start
 ```
+
+You start with the working `Hello, Go!` program from Chapter 4. There is no tooling yet — over the chapter you add a `Makefile` and `golangci-lint` around it.
 
 ## Finish Branch
 
 ```bash
-git checkout 04-installing-go-finish
+git checkout 05-developer-tooling-finish
 ```
 
-This branch adds your first program: a `main.go` that prints `Hello, Go!`. It confirms the Go toolchain is installed and working end to end.
+The finish branch adds a `Makefile` (run, build, fmt, vet, lint) and a `.golangci.yml` config.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:04-installing-go -->)
+[View the lesson on dalabs.academy](<!-- dalabs:05-developer-tooling -->)
 
 ## Running the Program
 
@@ -37,15 +40,6 @@ This prints:
 ```
 Hello, Go!
 ```
-
-You can also compile it to a standalone binary and run that:
-
-```bash
-go build
-./go-for-beginners
-```
-
-> **Note:** The compiled binary is named after the module (`go-for-beginners`) and is gitignored, so it never gets committed.
 
 ## Contact
 
