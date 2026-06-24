@@ -18,4 +18,8 @@ func main() {
 	fmt.Println("\n== Interfaces ==")
 
 	interfacesDemo()
+
+	fmt.Println("\n== Errors ==")
+
+	errorsDemo()
 }

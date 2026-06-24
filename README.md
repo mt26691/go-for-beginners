@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 11-interfaces-start
+git checkout 12-errors-start
 ```
 
-The start branch adds two new files. `store.go` defines the `TaskStore` interface (`Add`, `Get`, `All`) and two types that will satisfy it — an `InMemoryStore` backed by a `map[int]Task` and a `LoggingStore` that wraps another `TaskStore` — but their method bodies are stubbed with `// TODO` comments (they return zero values or just delegate). `interfaces.go` defines `interfacesDemo` and a `describe(any)` helper, also stubbed. `task.go` gains a `String()` method so `Task` satisfies `fmt.Stringer`. `main.go` adds a new `== Interfaces ==` section that calls `interfacesDemo`. It compiles, vets, lints, and runs (`make run`) — printing the structs and slices/maps output, then the `Interfaces` header — ready for you to fill in the two stores, `runStore`, the type switch in `describe`, and the empty-interface example.
+The start branch sets the stage for Go's error model. `store.go` gains a sentinel error, `var ErrTaskNotFound = errors.New("task not found")`, and a new `Find(id int) (Task, error)` method is added to the `TaskStore` interface and both stores — but the `InMemoryStore.Find` body is stubbed with a `// TODO`. A new `errorsdemo.go` declares a custom `ValidationError` type, an `errorsDemo()` function, and three helpers (`loadTask`, `validateTitle`, `safeDivide`), all stubbed with `// TODO` comments that return `nil` or zero values. `main.go` adds a new `== Errors ==` section that calls `errorsDemo`. It compiles, vets, lints, and runs (`make run`) — printing the earlier sections, then the `Errors` header with placeholder `<nil>` lines — ready for you to fill in the sentinel lookup, the `%w` wrap, `errors.Is`/`errors.As`, and the `recover` example.
 
 ## Finish Branch
 
 ```bash
-git checkout 11-interfaces-finish
+git checkout 12-errors-finish
 ```
 
-The finish branch completes `store.go` and `interfaces.go`. `InMemoryStore` assigns IDs and stores tasks in its map; its `All()` returns a snapshot **sorted by ID** so the output is deterministic. `LoggingStore` logs each call to an `io.Writer`, then delegates to the wrapped store — proving a wrapper can satisfy the same interface. `runStore(s TaskStore)` takes the **interface**, not a concrete type, and is called with both stores unchanged (the swappable seam this whole backend hangs on). `interfacesDemo` also shows a **type assertion**, a **type switch** (in `describe`), and the empty interface `any`. `Task` satisfies `fmt.Stringer` via `String()`. `make run` prints real, deterministic output.
+The finish branch completes the error model. `InMemoryStore.Find` returns the task when present and `ErrTaskNotFound` when it is missing — the sentinel the HTTP layer maps to a 404 later in the course. `loadTask` wraps `ErrTaskNotFound` with `fmt.Errorf("...: %w", ...)` so callers can still unwrap it; `errorsDemo` prints the wrapped chain and uses `errors.Is` to find the sentinel through the wrap. `validateTitle` returns a `*ValidationError`, recovered at the call site with `errors.As`. `safeDivide` uses `defer`/`recover` to turn a divide-by-zero panic into a returned error, so the program stays green. `make run` prints real, deterministic output.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/interfaces)
+[View the lesson on dalabs.academy](<!-- dalabs:12-errors -->)
 
 ## Running the Program
 
@@ -40,7 +40,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** On the finish branch `make run` prints real, deterministic output. The `Interfaces` section runs the same `runStore(s TaskStore)` function against an `InMemoryStore` and a `LoggingStore` and gets the same results — the swappable seam. `All()` sorts by ID so the output never changes between runs, and `LoggingStore` interleaves its `[log]` lines to show the wrapper satisfying the same interface.
+> **Note:** On the start branch the `== Errors ==` section prints placeholder `<nil>` lines because the helper bodies are stubbed. Fill in the `// TODO`s (or check out the finish branch) to see the wrapped error, `errors.Is` matching `ErrTaskNotFound` through a wrap, `errors.As` extracting the `ValidationError`, and `recover` turning a panic into an error.
 
 ## Contact
 

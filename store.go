@@ -1,10 +1,16 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"sort"
 )
+
+// ErrTaskNotFound is a sentinel error: a single, package-level error value that
+// callers compare against with errors.Is. Find returns it when no task has the
+// requested ID. Later in the course the HTTP layer maps this one error to a 404.
+var ErrTaskNotFound = errors.New("task not found")
 
 // TaskStore describes the behavior a task store must provide, without saying how.
 // Any type whose methods match this set satisfies it automatically — Go has no
@@ -12,9 +18,10 @@ import (
 // in-memory store now and the Postgres store later both satisfy this one
 // interface, so the code that depends on it never changes.
 type TaskStore interface {
-	Add(t Task) Task         // assigns an ID, stores the task, and returns it
-	Get(id int) (Task, bool) // comma-ok lookup: the task and whether it was found
-	All() []Task             // a snapshot of every task, sorted by ID
+	Add(t Task) Task           // assigns an ID, stores the task, and returns it
+	Get(id int) (Task, bool)   // comma-ok lookup: the task and whether it was found
+	Find(id int) (Task, error) // error-returning lookup: ErrTaskNotFound when missing
+	All() []Task               // a snapshot of every task, sorted by ID
 }
 
 // InMemoryStore keeps tasks in a map[int]Task keyed by ID. The constructor
@@ -41,6 +48,12 @@ func (s *InMemoryStore) Add(t Task) Task {
 func (s *InMemoryStore) Get(id int) (Task, bool) {
 	t, ok := s.tasks[id]
 	return t, ok
+}
+
+// Find looks a task up by ID and returns an error instead of a bool.
+// TODO: return the task when present, and ErrTaskNotFound when it is missing.
+func (s *InMemoryStore) Find(id int) (Task, error) {
+	return Task{}, nil
 }
 
 // All returns every task sorted by ID so the output is deterministic. Map
@@ -78,6 +91,12 @@ func (s *LoggingStore) Add(t Task) Task {
 func (s *LoggingStore) Get(id int) (Task, bool) {
 	_, _ = fmt.Fprintf(s.out, "  [log] Get(%d)\n", id)
 	return s.inner.Get(id)
+}
+
+// Find logs the call, then delegates to the wrapped store.
+func (s *LoggingStore) Find(id int) (Task, error) {
+	_, _ = fmt.Fprintf(s.out, "  [log] Find(%d)\n", id)
+	return s.inner.Find(id)
 }
 
 // All logs the call, then delegates to the wrapped store.
