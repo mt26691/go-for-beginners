@@ -1,0 +1,19 @@
+.PHONY: help run build fmt vet lint
+
+help: ## Show this help
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-8s\033[0m %s\n", $$1, $$2}'
+
+run: ## Run the application
+	go run .
+
+build: ## Compile the application
+	go build
+
+fmt: ## Format the code
+	go fmt ./...
+
+vet: ## Report suspicious code
+	go vet ./...
+
+lint: ## Run golangci-lint
+	golangci-lint run

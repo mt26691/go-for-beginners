@@ -15,7 +15,7 @@ This repository contains the source code for the [Go Programming for Beginners: 
 git checkout 05-developer-tooling-start
 ```
 
-You start with the working `Hello, Go!` program from Chapter 4. There is no tooling yet — over the chapter you add a `Makefile` and `golangci-lint` around it.
+The start branch is the same working `Hello, Go!` program from Chapter 4 — no tooling yet.
 
 ## Finish Branch
 
@@ -23,23 +23,31 @@ You start with the working `Hello, Go!` program from Chapter 4. There is no tool
 git checkout 05-developer-tooling-finish
 ```
 
-The finish branch adds a `Makefile` (run, build, fmt, vet, lint) and a `.golangci.yml` config.
+This branch adds developer tooling around the program: a `Makefile` that wraps the commands you type constantly, and a `.golangci.yml` config for `golangci-lint`.
 
 ## Lesson
 
 [View the lesson on dalabs.academy](<!-- dalabs:05-developer-tooling -->)
 
-## Running the Program
+## Using the Makefile
 
 ```bash
-go run .
+make run     # go run .   -> prints "Hello, Go!"
+make build   # go build   -> compiles the binary
+make fmt     # go fmt ./... -> formats the code
+make vet     # go vet ./... -> reports suspicious code
+make lint    # golangci-lint run -> runs the linter
+make help    # list the available targets
 ```
 
-This prints:
+On the clean Hello-World program, `make fmt`, `make vet`, and `make lint` all pass with no issues:
 
 ```
-Hello, Go!
+golangci-lint run
+0 issues.
 ```
+
+> **Note:** The `Makefile` grows later in the course — a `test` target arrives with the testing section and a `migrate` target with database migrations. The same `make lint` runs in CI at the end of the course.
 
 ## Contact
 
