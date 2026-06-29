@@ -27,7 +27,7 @@ The finish branch adds a minimal, working HTTP server in `main.go`. A single han
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:14-first-http-server -->)
+[View the lesson on dalabs.academy]({URL})
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
