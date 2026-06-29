@@ -27,7 +27,7 @@ The finish branch extends the Chapter 14 server with four handlers that demonstr
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:15-handlers-and-responses -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/handlers-and-responses)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
