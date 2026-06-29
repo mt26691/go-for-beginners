@@ -15,7 +15,7 @@ This repository contains the source code for the [Go Programming for Beginners: 
 git checkout 15-handlers-and-responses-start
 ```
 
-The start branch carries over the working "Hello from Go!" server from Chapter 14. `main.go` has `helloHandler` registered on `"/"` and `http.ListenAndServe(":8080", nil)`. You will build on this by adding `greetHandler`, `echoHandler`, and a custom `pingHandler` type to explore the full request/response API.
+The start branch carries over the working "Hello from Go!" server from Chapter 14. Your goal is to add `greetHandler`, `echoHandler`, and `pingHandler`, then register them on the mux to reach the finish state.
 
 ## Finish Branch
 
@@ -23,7 +23,7 @@ The start branch carries over the working "Hello from Go!" server from Chapter 1
 git checkout 15-handlers-and-responses-finish
 ```
 
-The finish branch adds three new handlers on top of the Chapter 14 server. `greetHandler` reads a query parameter and returns a 400 when it is missing. `echoHandler` reads the request body with `io.ReadAll`, sets a `Content-Type` header, and returns 201. `pingHandler` is a custom struct that satisfies `http.Handler` via `ServeHTTP`, demonstrating the interface directly rather than the `http.HandlerFunc` adapter.
+The finish branch extends the Chapter 14 server with four handlers that demonstrate the full request/response API. `greetHandler` reads a `name` query parameter and returns 400 when it is missing. `echoHandler` reads the request body with `io.ReadAll`, sets `Content-Type`, and returns 201. `pingHandler` is a custom struct satisfying `http.Handler` via `ServeHTTP`. All four are registered on the default mux.
 
 ## Lesson
 
@@ -36,11 +36,25 @@ The finish branch adds three new handlers on top of the Chapter 14 server. `gree
 go run .
 ```
 
-Then in another terminal:
+Then in another terminal try each route:
 
 ```bash
 curl http://localhost:8080/
 # Hello from Go!
+
+curl 'http://localhost:8080/greet?name=Tung'
+# Hello, Tung!
+
+curl -i 'http://localhost:8080/greet'
+# HTTP/1.1 400 Bad Request
+# missing 'name' query parameter
+
+curl -i -X POST --data 'hello body' http://localhost:8080/echo
+# HTTP/1.1 201 Created
+# hello body
+
+curl http://localhost:8080/ping
+# pong
 ```
 
 ```bash
@@ -51,7 +65,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the start branch — `main.go` still contains only the Chapter 14 "Hello from Go!" server. Your goal is to add `greetHandler`, `echoHandler`, and `pingHandler`, then wire them to the mux to reach the finish state.
+> **Note:** This is the finish branch — `main.go` contains the complete Chapter 15 server with all four handlers. Run `go run .` and curl each route to verify the responses.
 
 ## Contact
 
