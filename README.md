@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 14-first-http-server-start
+git checkout 15-handlers-and-responses-start
 ```
 
-The start branch is a clean slate for Section 3. All Section 2 demo files (`collections.go`, `concurrency.go`, `errorsdemo.go`, `interfaces.go`, `structs.go`, `store.go`, `task.go`) and the `mathx/` and `textx/` helper packages have been removed. `main.go` contains an empty `func main() {}` — ready for you to wire up your first HTTP server using `net/http`.
+The start branch carries over the working "Hello from Go!" server from Chapter 14. `main.go` has `helloHandler` registered on `"/"` and `http.ListenAndServe(":8080", nil)`. You will build on this by adding `greetHandler`, `echoHandler`, and a custom `pingHandler` type to explore the full request/response API.
 
 ## Finish Branch
 
 ```bash
-git checkout 14-first-http-server-finish
+git checkout 15-handlers-and-responses-finish
 ```
 
-The finish branch adds a minimal, working HTTP server in `main.go`. A single handler is registered for `"/"` via `http.HandleFunc`, writing a plain-text greeting to the response. `log.Fatal(http.ListenAndServe(":8080", nil))` starts the server and surfaces any error instead of silently ignoring it. Run `go run .` and hit `http://localhost:8080` with a browser or `curl` to see the response.
+The finish branch adds three new handlers on top of the Chapter 14 server. `greetHandler` reads a query parameter and returns a 400 when it is missing. `echoHandler` reads the request body with `io.ReadAll`, sets a `Content-Type` header, and returns 201. `pingHandler` is a custom struct that satisfies `http.Handler` via `ServeHTTP`, demonstrating the interface directly rather than the `http.HandlerFunc` adapter.
 
 ## Lesson
 
-[View the lesson on dalabs.academy]({URL})
+[View the lesson on dalabs.academy](<!-- dalabs:15-handlers-and-responses -->)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
@@ -39,7 +39,7 @@ go run .
 Then in another terminal:
 
 ```bash
-curl http://localhost:8080
+curl http://localhost:8080/
 # Hello from Go!
 ```
 
@@ -51,7 +51,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the finish branch — `main.go` contains a working HTTP server. `go run .` starts it on port 8080. Use `curl http://localhost:8080` or open your browser to see `Hello from Go!`. Stop the server with `Ctrl+C`.
+> **Note:** This is the start branch — `main.go` still contains only the Chapter 14 "Hello from Go!" server. Your goal is to add `greetHandler`, `echoHandler`, and `pingHandler`, then wire them to the mux to reach the finish state.
 
 ## Contact
 
