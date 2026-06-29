@@ -40,6 +40,7 @@ Then in another terminal:
 
 ```bash
 curl http://localhost:8080
+# Hello from Go!
 ```
 
 ```bash
@@ -50,7 +51,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the start branch — `main.go` is an empty stub. Your task is to add a `net/http` handler and call `http.ListenAndServe` to bring the server to life.
+> **Note:** This is the finish branch — `main.go` contains a working HTTP server. `go run .` starts it on port 8080. Use `curl http://localhost:8080` or open your browser to see `Hello from Go!`. Stop the server with `Ctrl+C`.
 
 ## Contact
 
