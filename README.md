@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 15-handlers-and-responses-start
+git checkout 16-routing-with-servemux-start
 ```
 
-The start branch carries over the working "Hello from Go!" server from Chapter 14. Your goal is to add `greetHandler`, `echoHandler`, and `pingHandler`, then register them on the mux to reach the finish state.
+The start branch carries over the Chapter 15 server, which registers `helloHandler`, `greetHandler`, `echoHandler`, and `pingHandler` on the **default mux** with bare path strings (`http.HandleFunc("/greet", ...)`). Your goal is to move to an explicit `http.NewServeMux()` and route the Task API surface with Go 1.22 method-plus-path patterns.
 
 ## Finish Branch
 
 ```bash
-git checkout 15-handlers-and-responses-finish
+git checkout 16-routing-with-servemux-finish
 ```
 
-The finish branch extends the Chapter 14 server with four handlers that demonstrate the full request/response API. `greetHandler` reads a `name` query parameter and returns 400 when it is missing. `echoHandler` reads the request body with `io.ReadAll`, sets `Content-Type`, and returns 201. `pingHandler` is a custom struct satisfying `http.Handler` via `ServeHTTP`. All four are registered on the default mux.
+The finish branch creates an explicit `http.NewServeMux()` and registers method-plus-path patterns: `GET /ping`, `GET /tasks`, `POST /tasks`, and `GET /tasks/{id}`. The wildcard handler reads the id with `r.PathValue("id")`. The task handlers are stubs for now (the in-memory store arrives in Section 4), but every route returns a real, curl-able response. `http.ListenAndServe` is passed `mux` instead of `nil`, so the mux you built owns the routing.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/handlers-and-responses)
+[View the lesson on dalabs.academy](<!-- dalabs:16-routing-with-servemux -->)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
@@ -39,22 +39,25 @@ go run .
 Then in another terminal try each route:
 
 ```bash
-curl http://localhost:8080/
-# Hello from Go!
-
-curl 'http://localhost:8080/greet?name=Tung'
-# Hello, Tung!
-
-curl -i 'http://localhost:8080/greet'
-# HTTP/1.1 400 Bad Request
-# missing 'name' query parameter
-
-curl -i -X POST --data 'hello body' http://localhost:8080/echo
-# HTTP/1.1 201 Created
-# hello body
-
 curl http://localhost:8080/ping
 # pong
+
+curl http://localhost:8080/tasks
+# [{"id":1,"title":"Write the routing chapter"}]
+
+curl -i -X POST http://localhost:8080/tasks
+# HTTP/1.1 201 Created
+# task created
+
+curl http://localhost:8080/tasks/42
+# task 42
+
+curl -i -X DELETE http://localhost:8080/tasks
+# HTTP/1.1 405 Method Not Allowed
+# Allow: GET, HEAD, POST
+
+curl -i http://localhost:8080/nope
+# HTTP/1.1 404 Not Found
 ```
 
 ```bash
@@ -65,7 +68,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the finish branch — `main.go` contains the complete Chapter 15 server with all four handlers. Run `go run .` and curl each route to verify the responses.
+> **Note:** This is the finish branch — `main.go` contains the complete Chapter 16 server using an explicit `http.NewServeMux()` with Go 1.22 method-plus-path patterns. Run `go run .` and curl each route to see the routing, the automatic `405` on a method mismatch, and the `404` on an unknown path.
 
 ## Contact
 
