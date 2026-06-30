@@ -45,6 +45,7 @@ The `main` branch contains the final, completed version of the entire course —
 | 13 | Goroutines & Concurrency Basics | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/13-goroutines-and-concurrency-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/13-goroutines-and-concurrency-finish) |
 | 14 | Hello, net/http: Your First Server | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/14-first-http-server-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/14-first-http-server-finish) |
 | 15 | Handlers, Requests & Responses | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/15-handlers-and-responses-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/15-handlers-and-responses-finish) |
+| 16 | Routing with ServeMux | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/16-routing-with-servemux-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/16-routing-with-servemux-finish) |
 
 ## Contact
 
