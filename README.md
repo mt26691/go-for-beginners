@@ -27,7 +27,7 @@ The finish branch creates an explicit `http.NewServeMux()` and registers method-
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:16-routing-with-servemux -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/routing-with-servemux)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
