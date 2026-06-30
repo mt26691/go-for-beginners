@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 15-handlers-and-responses-start
+git checkout 16-routing-with-servemux-start
 ```
 
-The start branch carries over the working "Hello from Go!" server from Chapter 14. Your goal is to add `greetHandler`, `echoHandler`, and `pingHandler`, then register them on the mux to reach the finish state.
+The start branch is the finished Chapter 15 server. `main.go` registers `helloHandler`, `greetHandler`, `echoHandler`, and `pingHandler` on the **default mux** with bare path strings (`http.HandleFunc("/greet", ...)` and `http.Handle("/ping", ...)`), and `http.ListenAndServe(":8080", nil)` uses that default mux. You will rebuild the routing on an explicit `http.NewServeMux()` and use Go 1.22 method-plus-path patterns to map the Task API endpoints.
 
 ## Finish Branch
 
 ```bash
-git checkout 15-handlers-and-responses-finish
+git checkout 16-routing-with-servemux-finish
 ```
 
-The finish branch extends the Chapter 14 server with four handlers that demonstrate the full request/response API. `greetHandler` reads a `name` query parameter and returns 400 when it is missing. `echoHandler` reads the request body with `io.ReadAll`, sets `Content-Type`, and returns 201. `pingHandler` is a custom struct satisfying `http.Handler` via `ServeHTTP`. All four are registered on the default mux.
+The finish branch creates an explicit `http.NewServeMux()` and registers method-plus-path patterns: `GET /ping`, `GET /tasks`, `POST /tasks`, and `GET /tasks/{id}` (read with `r.PathValue("id")`). The task handlers are curl-able stubs for now, and `http.ListenAndServe` receives `mux` instead of `nil`.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/handlers-and-responses)
+[View the lesson on dalabs.academy](<!-- dalabs:16-routing-with-servemux -->)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
@@ -36,22 +36,11 @@ The finish branch extends the Chapter 14 server with four handlers that demonstr
 go run .
 ```
 
-Then in another terminal try each route:
+Then in another terminal:
 
 ```bash
 curl http://localhost:8080/
 # Hello from Go!
-
-curl 'http://localhost:8080/greet?name=Tung'
-# Hello, Tung!
-
-curl -i 'http://localhost:8080/greet'
-# HTTP/1.1 400 Bad Request
-# missing 'name' query parameter
-
-curl -i -X POST --data 'hello body' http://localhost:8080/echo
-# HTTP/1.1 201 Created
-# hello body
 
 curl http://localhost:8080/ping
 # pong
@@ -65,7 +54,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the finish branch — `main.go` contains the complete Chapter 15 server with all four handlers. Run `go run .` and curl each route to verify the responses.
+> **Note:** This is the start branch — `main.go` still routes through the default mux with bare path strings, exactly as Chapter 15 left it. Your goal is to switch to an explicit `http.NewServeMux()` with Go 1.22 method-plus-path patterns and route the Task API onto it.
 
 ## Contact
 
