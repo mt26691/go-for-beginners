@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 17-working-with-json-start
+git checkout 18-context-start
 ```
 
-The start branch carries over the Chapter 16 server. The routes are wired on an explicit `http.NewServeMux()` with Go 1.22 method-plus-path patterns, but the task handlers still fake their JSON: `listTasks` writes a hard-coded JSON *string*, `createTask` returns `201` with plain text, and `getTask` echoes the id as plain text.
+The start branch carries over the Chapter 17 JSON server: a `Task` struct with JSON struct tags, the reusable `writeJSON` helper, and the `GET /ping`, `GET /tasks`, `POST /tasks`, `GET /tasks/{id}` routes on an explicit `http.NewServeMux()`. Your goal in this chapter is to add a spotlight on `context.Context` — carrying a cancellation signal, a deadline, and request-scoped values from the handler down the call chain.
 
 ## Finish Branch
 
 ```bash
-git checkout 17-working-with-json-finish
+git checkout 18-context-finish
 ```
 
-The finish branch turns those fakes into real JSON with `encoding/json`. It adds a `Task` struct with JSON struct tags (`json:"title"`, `omitempty`, and one field excluded with `json:"-"`) and a reusable `writeJSON(w, status, v)` helper that sets `Content-Type: application/json`, writes the status, and streams the value with `json.NewEncoder(w).Encode`. `listTasks` encodes a real `[]Task`, `getTask` parses the `{id}` and returns a single `Task`, and `createTask` decodes the request body with `json.NewDecoder(r.Body).Decode` and echoes it back with `201` (or `400` on a decode error). `GET /ping` stays plain text for contrast.
+The finish branch adds three focused context demos on top of the JSON server: a `GET /slow` handler that watches `r.Context().Done()` so a disconnected client cancels the request, a `findTask(ctx, id)` store stand-in that `getTask` calls through a `context.WithTimeout` deadline (with a `GET /slow-store` route that trips `context.DeadlineExceeded`), and a `GET /trace` handler that stashes a request ID on the context with a typed key and reads it back downstream.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/working-with-json)
+[View the lesson on dalabs.academy](<!-- dalabs:18-context -->)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
@@ -50,10 +50,6 @@ curl http://localhost:8080/tasks/42
 
 curl -X POST http://localhost:8080/tasks -d '{"title":"Buy milk","done":false}'
 # {"id":0,"title":"Buy milk","done":false}
-
-curl -i -X POST http://localhost:8080/tasks -d 'not json'
-# HTTP/1.1 400 Bad Request
-# invalid JSON body
 ```
 
 ```bash
@@ -64,7 +60,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the finish branch — `main.go` contains the complete Chapter 17 server. Every task route now speaks real JSON through the `writeJSON` helper and `json.NewDecoder`. Notice how `description` is omitted when empty (`omitempty`) and the `Internal` field never appears on the wire (`json:"-"`). The `Task` struct and `writeJSON` helper here are reused by the rest of the course.
+> **Note:** This is the start branch — `main.go` is exactly the Chapter 17 JSON server, with no context handling yet. Follow the chapter to add the `/slow`, `/slow-store`, and `/trace` demos and to wire a `context.WithTimeout` deadline into `getTask`.
 
 ## Contact
 
