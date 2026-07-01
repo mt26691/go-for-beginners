@@ -47,6 +47,7 @@ The `main` branch contains the final, completed version of the entire course —
 | 15 | Handlers, Requests & Responses | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/15-handlers-and-responses-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/15-handlers-and-responses-finish) |
 | 16 | Routing with ServeMux | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/16-routing-with-servemux-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/16-routing-with-servemux-finish) |
 | 17 | Working with JSON | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/17-working-with-json-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/17-working-with-json-finish) |
+| 18 | context.Context: Cancellation, Deadlines & Request Scope | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/18-context-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/18-context-finish) |
 
 ## Contact
 
