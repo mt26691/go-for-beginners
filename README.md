@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 16-routing-with-servemux-start
+git checkout 17-working-with-json-start
 ```
 
-The start branch carries over the Chapter 15 server, which registers `helloHandler`, `greetHandler`, `echoHandler`, and `pingHandler` on the **default mux** with bare path strings (`http.HandleFunc("/greet", ...)`). Your goal is to move to an explicit `http.NewServeMux()` and route the Task API surface with Go 1.22 method-plus-path patterns.
+The start branch carries over the Chapter 16 server. The routes are wired on an explicit `http.NewServeMux()` with Go 1.22 method-plus-path patterns, but the task handlers still fake their JSON: `listTasks` writes a hard-coded JSON *string*, `createTask` returns `201` with plain text, and `getTask` echoes the id as plain text.
 
 ## Finish Branch
 
 ```bash
-git checkout 16-routing-with-servemux-finish
+git checkout 17-working-with-json-finish
 ```
 
-The finish branch creates an explicit `http.NewServeMux()` and registers method-plus-path patterns: `GET /ping`, `GET /tasks`, `POST /tasks`, and `GET /tasks/{id}`. The wildcard handler reads the id with `r.PathValue("id")`. The task handlers are stubs for now (the in-memory store arrives in Section 4), but every route returns a real, curl-able response. `http.ListenAndServe` is passed `mux` instead of `nil`, so the mux you built owns the routing.
+The finish branch turns those fakes into real JSON with `encoding/json`. It adds a `Task` struct with JSON struct tags (`json:"title"`, `omitempty`, and one field excluded with `json:"-"`) and a reusable `writeJSON(w, status, v)` helper that sets `Content-Type: application/json`, writes the status, and streams the value with `json.NewEncoder(w).Encode`. `listTasks` encodes a real `[]Task`, `getTask` parses the `{id}` and returns a single `Task`, and `createTask` decodes the request body with `json.NewDecoder(r.Body).Decode` and echoes it back with `201` (or `400` on a decode error). `GET /ping` stays plain text for contrast.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/routing-with-servemux)
+[View the lesson on dalabs.academy](<!-- dalabs:17-working-with-json -->)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
@@ -43,21 +43,17 @@ curl http://localhost:8080/ping
 # pong
 
 curl http://localhost:8080/tasks
-# [{"id":1,"title":"Write the routing chapter"}]
-
-curl -i -X POST http://localhost:8080/tasks
-# HTTP/1.1 201 Created
-# task created
+# [{"id":1,"title":"Write the JSON chapter","done":true},{"id":2,"title":"Record the demo","description":"curl every route","done":false}]
 
 curl http://localhost:8080/tasks/42
-# task 42
+# {"id":42,"title":"Sample task","done":false}
 
-curl -i -X DELETE http://localhost:8080/tasks
-# HTTP/1.1 405 Method Not Allowed
-# Allow: GET, HEAD, POST
+curl -X POST http://localhost:8080/tasks -d '{"title":"Buy milk","done":false}'
+# {"id":0,"title":"Buy milk","done":false}
 
-curl -i http://localhost:8080/nope
-# HTTP/1.1 404 Not Found
+curl -i -X POST http://localhost:8080/tasks -d 'not json'
+# HTTP/1.1 400 Bad Request
+# invalid JSON body
 ```
 
 ```bash
@@ -68,7 +64,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the finish branch — `main.go` contains the complete Chapter 16 server using an explicit `http.NewServeMux()` with Go 1.22 method-plus-path patterns. Run `go run .` and curl each route to see the routing, the automatic `405` on a method mismatch, and the `404` on an unknown path.
+> **Note:** This is the finish branch — `main.go` contains the complete Chapter 17 server. Every task route now speaks real JSON through the `writeJSON` helper and `json.NewDecoder`. Notice how `description` is omitted when empty (`omitempty`) and the `Internal` field never appears on the wire (`json:"-"`). The `Task` struct and `writeJSON` helper here are reused by the rest of the course.
 
 ## Contact
 
