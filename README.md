@@ -46,6 +46,7 @@ The `main` branch contains the final, completed version of the entire course —
 | 14 | Hello, net/http: Your First Server | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/14-first-http-server-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/14-first-http-server-finish) |
 | 15 | Handlers, Requests & Responses | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/15-handlers-and-responses-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/15-handlers-and-responses-finish) |
 | 16 | Routing with ServeMux | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/16-routing-with-servemux-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/16-routing-with-servemux-finish) |
+| 17 | Working with JSON | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/17-working-with-json-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/17-working-with-json-finish) |
 
 ## Contact
 
