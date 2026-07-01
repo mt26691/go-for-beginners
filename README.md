@@ -33,7 +33,7 @@ The finish branch adds three focused context demos on top of the JSON server:
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:18-context -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/context)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
