@@ -27,7 +27,7 @@ The finish branch turns those fakes into real JSON with `encoding/json`. It adds
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:17-working-with-json -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/working-with-json)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
