@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 16-routing-with-servemux-start
+git checkout 17-working-with-json-start
 ```
 
-The start branch carries over the Chapter 15 server, which registers `helloHandler`, `greetHandler`, `echoHandler`, and `pingHandler` on the **default mux** with bare path strings (`http.HandleFunc("/greet", ...)`). Your goal is to move to an explicit `http.NewServeMux()` and route the Task API surface with Go 1.22 method-plus-path patterns.
+The start branch carries over the Chapter 16 server. The routes are wired on an explicit `http.NewServeMux()` with Go 1.22 method-plus-path patterns (`GET /ping`, `GET /tasks`, `POST /tasks`, `GET /tasks/{id}`), but the task handlers still fake their JSON: `listTasks` writes a hard-coded JSON *string*, `createTask` returns `201` with plain text, and `getTask` echoes the id as plain text. Your goal is to make these handlers speak real JSON with `encoding/json`.
 
 ## Finish Branch
 
 ```bash
-git checkout 16-routing-with-servemux-finish
+git checkout 17-working-with-json-finish
 ```
 
-The finish branch creates an explicit `http.NewServeMux()` and registers method-plus-path patterns: `GET /ping`, `GET /tasks`, `POST /tasks`, and `GET /tasks/{id}`. The wildcard handler reads the id with `r.PathValue("id")`. The task handlers are stubs for now (the in-memory store arrives in Section 4), but every route returns a real, curl-able response. `http.ListenAndServe` is passed `mux` instead of `nil`, so the mux you built owns the routing.
+The finish branch introduces a `Task` struct with JSON struct tags, a reusable `writeJSON` helper, and real encode/decode: `listTasks` encodes a `[]Task`, `getTask` returns a single `Task` built from the `{id}`, and `createTask` decodes the request body into a `Task` and echoes it back with `201` (or `400` on a decode error).
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/routing-with-servemux)
+[View the lesson on dalabs.academy](<!-- dalabs:17-working-with-json -->)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Running the Server
@@ -51,13 +51,6 @@ curl -i -X POST http://localhost:8080/tasks
 
 curl http://localhost:8080/tasks/42
 # task 42
-
-curl -i -X DELETE http://localhost:8080/tasks
-# HTTP/1.1 405 Method Not Allowed
-# Allow: GET, HEAD, POST
-
-curl -i http://localhost:8080/nope
-# HTTP/1.1 404 Not Found
 ```
 
 ```bash
@@ -68,7 +61,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the finish branch — `main.go` contains the complete Chapter 16 server using an explicit `http.NewServeMux()` with Go 1.22 method-plus-path patterns. Run `go run .` and curl each route to see the routing, the automatic `405` on a method mismatch, and the `404` on an unknown path.
+> **Note:** This is the start branch — the task handlers still fake their responses (a hard-coded JSON string and plain text). Over the chapter you will replace them with real JSON encoding and decoding using the `encoding/json` package.
 
 ## Contact
 
