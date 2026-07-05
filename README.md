@@ -49,6 +49,7 @@ The `main` branch contains the final, completed version of the entire course —
 | 17 | Working with JSON | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/17-working-with-json-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/17-working-with-json-finish) |
 | 18 | context.Context: Cancellation, Deadlines & Request Scope | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/18-context-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/18-context-finish) |
 | 19 | Designing the API & Project Layout | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/19-designing-the-api-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/19-designing-the-api-finish) |
+| 20 | Create and List Tasks | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/20-create-and-list-tasks-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/20-create-and-list-tasks-finish) |
 
 ## Contact
 
