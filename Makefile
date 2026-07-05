@@ -4,10 +4,10 @@ help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-8s\033[0m %s\n", $$1, $$2}'
 
 run: ## Run the application
-	go run .
+	go run ./cmd/server
 
 build: ## Compile the application
-	go build
+	go build ./...
 
 fmt: ## Format the code
 	go fmt ./...

@@ -12,74 +12,63 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 18-context-start
+git checkout 19-designing-the-api-start
 ```
 
-The start branch carries over the Chapter 17 JSON server: a `Task` struct with JSON struct tags, the reusable `writeJSON` helper, and the `GET /ping`, `GET /tasks`, `POST /tasks`, `GET /tasks/{id}` routes on an explicit `http.NewServeMux()`. Your goal in this chapter is to add a spotlight on `context.Context` — carrying a cancellation signal, a deadline, and request-scoped values from the handler down the call chain.
+The start branch is the empty target layout. The single-file `main.go` from Section 3 is gone; in its place is an idiomatic Go project layout: `cmd/server/main.go` holds a minimal entry point that boots a `http.NewServeMux()` with just `GET /ping`, and `internal/task/task.go` holds the finalized `Task` resource (`id`, `title`, `description`, `done`, `createdAt`). Your goal in this chapter is to fill in the `internal/task` package — an in-memory `Store` and the task HTTP handlers — and wire them into `main`.
 
 ## Finish Branch
 
 ```bash
-git checkout 18-context-finish
+git checkout 19-designing-the-api-finish
 ```
 
-The finish branch adds three focused context demos on top of the JSON server:
-
-- **Cancellation** — `slowHandler` (`GET /slow`) starts a 5-second job and `select`s on `r.Context().Done()`. When the client disconnects, the request's context is cancelled automatically and the handler logs `context canceled` instead of finishing.
-- **Deadlines** — `getTask` (`GET /tasks/{id}`) derives `ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)`, always `defer cancel()`s, and passes `ctx` into a `findTask(ctx, id)` store stand-in. A dedicated `GET /slow-store` route uses a 100ms deadline against the same ~500ms "query" so it trips `context.DeadlineExceeded` and returns `504`.
-- **Request-scoped values** — `traceHandler` (`GET /trace`) reads an `X-Request-ID` header, stashes it on the context with a typed key, and reads it back downstream through a `requestIDFrom(ctx)` accessor.
-
-`findTask` is a stand-in for the real `pgx` queries added in Chapter 27; it takes a `context.Context` as its first argument for exactly the same reason the database calls will.
+The finish branch is a compiling skeleton: `internal/task` grows a `Store` (a `map[int]Task` guarded by a `sync.Mutex`) with a `NewStore` constructor and a `List` method, plus a `Handler` that registers `GET /tasks`, `POST /tasks`, and `GET /tasks/{id}` on the mux. `main` wires the store into the handler. `GET /tasks` returns `[]` from the store; `POST /tasks` and `GET /tasks/{id}` are deliberate stubs that return `501 Not Implemented` — the real create/read logic lands in Chapters 20 and 21.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/your-first-http-server/context)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/building-the-task-api/designing-the-api)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
+
+## Project Layout
+
+```
+cmd/
+  server/
+    main.go        # entry point: builds the mux, wires the store + handlers, starts the server
+internal/
+  task/
+    task.go        # the Task resource (model)
+    store.go       # in-memory Store (finish branch)
+    handler.go     # task HTTP handlers (finish branch)
+```
+
+`internal/` is a Go convention: packages under it can only be imported by code inside this module, so the task domain stays private to this service. Keep the package count small — this is a small API, not a place for premature "clean architecture."
 
 ## Running the Server
 
 ```bash
-go run .
+make run     # go run ./cmd/server
 ```
 
-Then in another terminal try each route:
+Then in another terminal:
 
 ```bash
 curl http://localhost:8080/ping
 # pong
-
-curl http://localhost:8080/tasks
-# [{"id":1,"title":"Write the JSON chapter","done":true},{"id":2,"title":"Record the demo","description":"curl every route","done":false}]
-
-curl http://localhost:8080/tasks/42
-# {"id":42,"title":"Sample task","done":false}   (returns after ~500ms; the 2s deadline is not hit)
-
-# 1. Client-disconnect cancellation: kill the request early and watch the server log
-curl --max-time 1 http://localhost:8080/slow
-# curl: (28) Operation timed out after 1005 milliseconds with 0 bytes received
-# server log: slow: request cancelled: context canceled
-
-# 2. Caller-imposed deadline: the 100ms deadline fires before the 500ms "query"
-curl -i http://localhost:8080/slow-store
-# HTTP/1.1 504 Gateway Timeout
-# context deadline exceeded
-# server log: slow-store: context deadline exceeded
-
-# 3. Request-scoped value carried on the context
-curl -H "X-Request-ID: abc-123" http://localhost:8080/trace
-# {"requestID":"abc-123"}
-# server log: trace: handling request abc-123
 ```
 
+On the start branch there are no task routes yet, so `curl http://localhost:8080/tasks` returns `404`.
+
 ```bash
-make build   # go build   -> compiles the binary
-make fmt     # go fmt ./... -> formats the code
-make vet     # go vet ./... -> reports suspicious code
+make build   # go build ./... -> compiles every package
+make fmt     # go fmt ./...   -> formats the code
+make vet     # go vet ./...   -> reports suspicious code
 make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the finish branch — `main.go` keeps the Chapter 17 JSON server (`Task`, `writeJSON`, and the task routes) and adds the `context.Context` demos: `slowHandler`, `findTask`, `slowStoreHandler`, and `traceHandler`. `go build`, `go vet`, and `gofmt` are all clean. `make lint` still reports one `errcheck` finding on the unchecked `fmt.Fprintln` in `ping` (unchanged since Chapter 14) — that is expected for this build-and-run branch.
+> **Note:** This is the start branch — the layout scaffold only. `cmd/server/main.go` boots a `/ping`-only server and `internal/task/task.go` defines the `Task` struct. `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean. Follow the chapter to add `internal/task/store.go` and `internal/task/handler.go` and wire the task routes.
 
 ## Contact
 

@@ -8,8 +8,9 @@
 *.so
 *.dylib
 
-# Compiled binary produced by `go build` (named after the module)
+# Compiled binaries produced by `go build`
 /go-for-beginners
+/server
 
 # Test binary, built with `go test -c`
 *.test
