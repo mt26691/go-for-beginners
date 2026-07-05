@@ -57,20 +57,18 @@ make run     # go run ./cmd/server
 Then in another terminal:
 
 ```bash
-curl http://localhost:8080/ping
-# pong
+curl -i -X POST http://localhost:8080/tasks -d '{"title":"Buy milk"}'
+# HTTP/1.1 201 Created
+# Content-Type: application/json
+# {"id":1,"title":"Buy milk","done":false,"createdAt":"2026-07-06T09:06:50.109193+10:00"}
 
 curl -i http://localhost:8080/tasks
 # HTTP/1.1 200 OK
 # Content-Type: application/json
-# []
-
-curl -i -X POST http://localhost:8080/tasks -d '{"title":"Buy milk"}'
-# HTTP/1.1 501 Not Implemented
-# not implemented
+# [{"id":1,"title":"Buy milk","done":false,"createdAt":"2026-07-06T09:06:50.109193+10:00"}]
 ```
 
-On the **start** branch `POST /tasks` still returns `501`; on the **finish** branch it returns `201` with the created task and `GET /tasks` returns the array.
+The server assigns the `id` and `createdAt`; the client only sends `title` and `description`. Input validation and a consistent JSON error shape arrive in Chapter 22, so a bad body returns a plain-text `400` for now.
 
 ```bash
 make build   # go build ./... -> compiles every package
@@ -80,7 +78,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the start branch — the Chapter 19 skeleton. `GET /tasks` returns `[]`, while `POST /tasks` and `GET /tasks/{id}` return `501 Not Implemented`. `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
+> **Note:** This is the finish branch. `POST /tasks` creates a task and returns `201`, `GET /tasks` returns the list with `200`, and `GET /tasks/{id}` is still a `501` stub (Chapter 21). `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
 
 ## Contact
 

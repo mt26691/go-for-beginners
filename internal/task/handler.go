@@ -20,12 +20,29 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /tasks/{id}", h.get)
 }
 
-func (h *Handler) list(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, h.store.List())
+func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
+	tasks, err := h.store.List(r.Context())
+	if err != nil {
+		http.Error(w, "failed to list tasks", http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, http.StatusOK, tasks)
 }
 
-func (h *Handler) create(w http.ResponseWriter, _ *http.Request) {
-	http.Error(w, "not implemented", http.StatusNotImplemented)
+func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
+	var t Task
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	created, err := h.store.Create(r.Context(), t)
+	if err != nil {
+		http.Error(w, "failed to create task", http.StatusInternalServerError)
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, created)
 }
 
 func (h *Handler) get(w http.ResponseWriter, _ *http.Request) {
