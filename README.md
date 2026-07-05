@@ -15,7 +15,7 @@ This repository contains the source code for the [Go Programming for Beginners: 
 git checkout 19-designing-the-api-start
 ```
 
-The start branch is the empty target layout. The single-file `main.go` from Section 3 is gone; in its place is an idiomatic Go project layout: `cmd/server/main.go` holds a minimal entry point that boots a `http.NewServeMux()` with just `GET /ping`, and `internal/task/task.go` holds the finalized `Task` resource (`id`, `title`, `description`, `done`, `createdAt`). Your goal in this chapter is to fill in the `internal/task` package — an in-memory `Store` and the task HTTP handlers — and wire them into `main`.
+The start branch is the empty target layout. The single-file `main.go` from Section 3 is gone; in its place is an idiomatic Go project layout: `cmd/server/main.go` holds a minimal entry point that boots a `http.NewServeMux()` with just `GET /ping`, and `internal/task/task.go` holds the finalized `Task` resource (`id`, `title`, `description`, `done`, `createdAt`). The chapter fills in the `internal/task` package — an in-memory `Store` and the task HTTP handlers — and wires them into `main`.
 
 ## Finish Branch
 
@@ -23,7 +23,12 @@ The start branch is the empty target layout. The single-file `main.go` from Sect
 git checkout 19-designing-the-api-finish
 ```
 
-The finish branch is a compiling skeleton: `internal/task` grows a `Store` (a `map[int]Task` guarded by a `sync.Mutex`) with a `NewStore` constructor and a `List` method, plus a `Handler` that registers `GET /tasks`, `POST /tasks`, and `GET /tasks/{id}` on the mux. `main` wires the store into the handler. `GET /tasks` returns `[]` from the store; `POST /tasks` and `GET /tasks/{id}` are deliberate stubs that return `501 Not Implemented` — the real create/read logic lands in Chapters 20 and 21.
+The finish branch is a compiling skeleton. `internal/task` grows two files:
+
+- **`store.go`** — a `Store` wrapping a `map[int]Task` guarded by a `sync.Mutex` (every request runs in its own goroutine), with a `NewStore` constructor and a `List` method. No `nextID` yet and no `Create`/`Get` methods — those arrive in Chapters 20 and 21.
+- **`handler.go`** — a `Handler` holding the `*Store`, a `Routes(mux)` method that registers `GET /tasks`, `POST /tasks`, and `GET /tasks/{id}`, and the shared `writeJSON` helper. `list` returns whatever the store holds (an empty `[]` for now); `create` and `get` are deliberate stubs that return `501 Not Implemented`.
+
+`cmd/server/main.go` wires it together: build the mux, register `GET /ping`, create the store, hand it to `NewHandler`, register the task routes, and start listening.
 
 ## Lesson
 
@@ -39,8 +44,8 @@ cmd/
 internal/
   task/
     task.go        # the Task resource (model)
-    store.go       # in-memory Store (finish branch)
-    handler.go     # task HTTP handlers (finish branch)
+    store.go       # in-memory Store (map[int]Task + sync.Mutex)
+    handler.go     # task HTTP handlers + writeJSON helper
 ```
 
 `internal/` is a Go convention: packages under it can only be imported by code inside this module, so the task domain stays private to this service. Keep the package count small — this is a small API, not a place for premature "clean architecture."
@@ -56,9 +61,22 @@ Then in another terminal:
 ```bash
 curl http://localhost:8080/ping
 # pong
+
+curl -i http://localhost:8080/tasks
+# HTTP/1.1 200 OK
+# Content-Type: application/json
+# []
+
+curl -i -X POST http://localhost:8080/tasks -d '{"title":"Buy milk"}'
+# HTTP/1.1 501 Not Implemented
+# not implemented
+
+curl -i http://localhost:8080/tasks/1
+# HTTP/1.1 501 Not Implemented
+# not implemented
 ```
 
-On the start branch there are no task routes yet, so `curl http://localhost:8080/tasks` returns `404`.
+`GET /tasks` returns an empty JSON array `[]` (not `null`) from the store; the two stubbed routes return `501` until Chapters 20 and 21 fill them in.
 
 ```bash
 make build   # go build ./... -> compiles every package
@@ -68,7 +86,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the start branch — the layout scaffold only. `cmd/server/main.go` boots a `/ping`-only server and `internal/task/task.go` defines the `Task` struct. `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean. Follow the chapter to add `internal/task/store.go` and `internal/task/handler.go` and wire the task routes.
+> **Note:** This is the finish branch — a compiling skeleton. The layout is in place, `GET /tasks` returns `[]` from the in-memory store, and `POST /tasks` and `GET /tasks/{id}` return `501 Not Implemented`. `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
 
 ## Contact
 
