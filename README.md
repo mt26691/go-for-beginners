@@ -32,7 +32,7 @@ Client mistakes (bad input) are `4xx`; only genuinely unexpected failures are `5
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:22-validation-and-errors -->)
+[View the lesson on dalabs.academy]({URL})
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Project Layout
