@@ -15,7 +15,7 @@ This repository contains the source code for the [Go Programming for Beginners: 
 git checkout 21-get-update-delete-task-start
 ```
 
-The start branch is the finish state of Chapter 20. Two endpoints work: `POST /tasks` creates a task and returns `201`, and `GET /tasks` returns the list with `200`. `GET /tasks/{id}` is still a `501 Not Implemented` stub, and there is no way to update or delete a task. The store (`internal/task/store.go`) has only `Create` and `List`. This chapter finishes CRUD on a single resource: fill in the `get` handler and add update and delete.
+The start branch is the finish state of Chapter 20. `POST /tasks` creates a task and returns `201`, `GET /tasks` returns the list with `200`, and `GET /tasks/{id}` is still a `501 Not Implemented` stub. The store (`internal/task/store.go`) has `Create` and `List` methods; it has no way to fetch, update, or delete a single task yet. This chapter fills in the `get` handler and adds update and delete to finish CRUD on a single resource.
 
 ## Finish Branch
 
@@ -25,8 +25,10 @@ git checkout 21-get-update-delete-task-finish
 
 The finish branch completes CRUD on a single task:
 
-- **`store.go`** — a sentinel `ErrNotFound` plus `Get(ctx, id) (Task, error)`, `Update(ctx, id, Task) (Task, error)`, and `Delete(ctx, id) error`, each guarded by the mutex and each returning `ErrNotFound` when the ID is absent. `Update` is a full replace that keeps the original `ID` and `CreatedAt`.
-- **`handler.go`** — `get`, `update`, and `delete` parse the path ID with `strconv.Atoi` (bad ID → `400`), map `errors.Is(err, ErrNotFound)` → `404` and other errors → `500`, and register `GET`, `PUT`, and `DELETE` on `/tasks/{id}`. `DELETE` returns `204 No Content`.
+- **`store.go`** — a sentinel `ErrNotFound` (`var ErrNotFound = errors.New("task not found")`) plus three new mutex-guarded methods: `Get(ctx, id) (Task, error)`, `Update(ctx, id, Task) (Task, error)`, and `Delete(ctx, id) error`. Each returns `ErrNotFound` when the ID is absent. `Update` is a **full replace**: it keeps the original `ID` and `CreatedAt` and takes every other field from the incoming task.
+- **`handler.go`** — `get`, `update`, and `delete` read the path with `r.PathValue("id")` and parse it with `strconv.Atoi`; a non-numeric ID returns `400`. Handlers map `errors.Is(err, ErrNotFound)` to `404` and any other error to `500`. `get` returns `200` with the task, `update` returns `200` with the updated task, and `delete` returns `204 No Content` with an empty body. `Routes` now registers `GET`, `PUT`, and `DELETE` on `/tasks/{id}`.
+
+`PUT` is a full replace. The partial-update alternative is `PATCH`, which this course does not implement. Validation and a consistent JSON error shape still arrive in Chapter 22, so a bad ID or bad body returns a plain-text `400` for now.
 
 ## Lesson
 
@@ -42,7 +44,7 @@ cmd/
 internal/
   task/
     task.go        # the Task resource (model)
-    store.go       # in-memory Store (map[int]Task + sync.Mutex): Create, List
+    store.go       # in-memory Store (map[int]Task + sync.Mutex): Create, List, Get, Update, Delete
     handler.go     # task HTTP handlers + writeJSON helper
 ```
 
@@ -57,14 +59,28 @@ make run     # go run ./cmd/server
 Then in another terminal:
 
 ```bash
-curl -i -X POST http://localhost:8080/tasks -d '{"title":"Buy milk"}'
+# create a task so there is an id 1 to work with
+curl -i -X POST http://localhost:8080/tasks -d '{"title":"Write the chapter","description":"Draft chapter 21"}'
 # HTTP/1.1 201 Created
 
-curl -i http://localhost:8080/tasks
-# HTTP/1.1 200 OK
-
 curl -i http://localhost:8080/tasks/1
-# HTTP/1.1 501 Not Implemented   <- the stub this chapter replaces
+# HTTP/1.1 200 OK
+# {"id":1,"title":"Write the chapter","description":"Draft chapter 21","done":false,"createdAt":"..."}
+
+curl -i http://localhost:8080/tasks/999
+# HTTP/1.1 404 Not Found
+# task not found
+
+curl -i -X PUT http://localhost:8080/tasks/1 -d '{"title":"Ship the chapter","done":true}'
+# HTTP/1.1 200 OK  (full replace: id and createdAt are preserved)
+# {"id":1,"title":"Ship the chapter","done":true,"createdAt":"..."}
+
+curl -i -X DELETE http://localhost:8080/tasks/1
+# HTTP/1.1 204 No Content  (empty body)
+
+curl -i http://localhost:8080/tasks/abc
+# HTTP/1.1 400 Bad Request
+# invalid task id
 ```
 
 ```bash
@@ -75,7 +91,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the start branch. `GET /tasks/{id}` still returns `501`, and there is no update or delete yet. `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
+> **Note:** This is the finish branch. All five task routes work — `POST /tasks`, `GET /tasks`, `GET /tasks/{id}`, `PUT /tasks/{id}`, and `DELETE /tasks/{id}`. `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
 
 ## Contact
 
