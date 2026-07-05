@@ -12,27 +12,25 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 19-designing-the-api-start
+git checkout 20-create-and-list-tasks-start
 ```
 
-The start branch is the empty target layout. The single-file `main.go` from Section 3 is gone; in its place is an idiomatic Go project layout: `cmd/server/main.go` holds a minimal entry point that boots a `http.NewServeMux()` with just `GET /ping`, and `internal/task/task.go` holds the finalized `Task` resource (`id`, `title`, `description`, `done`, `createdAt`). The chapter fills in the `internal/task` package — an in-memory `Store` and the task HTTP handlers — and wires them into `main`.
+The start branch is the compiling skeleton from Chapter 19. The project layout is in place: `cmd/server/main.go` boots a `http.NewServeMux()` and wires the store into the task handlers, `internal/task/task.go` holds the `Task` resource, `internal/task/store.go` holds an in-memory `Store` (a `map[int]Task` guarded by a `sync.Mutex`) with a `List` method, and `internal/task/handler.go` registers the routes. `GET /tasks` already returns an empty JSON array, but `POST /tasks` and `GET /tasks/{id}` are stubs that return `501 Not Implemented`. This chapter turns the `create` stub into a working handler and gives the store a `Create` method.
 
 ## Finish Branch
 
 ```bash
-git checkout 19-designing-the-api-finish
+git checkout 20-create-and-list-tasks-finish
 ```
 
-The finish branch is a compiling skeleton. `internal/task` grows two files:
+The finish branch has the first real endpoints working:
 
-- **`store.go`** — a `Store` wrapping a `map[int]Task` guarded by a `sync.Mutex` (every request runs in its own goroutine), with a `NewStore` constructor and a `List` method. No `nextID` yet and no `Create`/`Get` methods — those arrive in Chapters 20 and 21.
-- **`handler.go`** — a `Handler` holding the `*Store`, a `Routes(mux)` method that registers `GET /tasks`, `POST /tasks`, and `GET /tasks/{id}`, and the shared `writeJSON` helper. `list` returns whatever the store holds (an empty `[]` for now); `create` and `get` are deliberate stubs that return `501 Not Implemented`.
-
-`cmd/server/main.go` wires it together: build the mux, register `GET /ping`, create the store, hand it to `NewHandler`, register the task routes, and start listening.
+- **`store.go`** — the `Store` gains a `nextID` counter and a `Create(ctx, Task) (Task, error)` method that assigns the ID, stamps `CreatedAt` with `time.Now()`, and stores the task under the mutex. `List` now takes a `context.Context` and returns `([]Task, error)` so both methods share the shape the database-backed store will need in Section 6.
+- **`handler.go`** — `create` decodes the JSON body with `json.NewDecoder`, calls `store.Create`, and returns `201 Created` with the stored task (including the server-assigned `id` and `createdAt`); a bad body returns `400`. `list` calls `store.List` and returns the array with `200`. Both handlers pass `r.Context()` down to the store. `get` is still a `501` stub — Chapter 21 fills it in.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/building-the-task-api/designing-the-api)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/building-the-task-api/create-and-list-tasks)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Project Layout
@@ -70,13 +68,9 @@ curl -i http://localhost:8080/tasks
 curl -i -X POST http://localhost:8080/tasks -d '{"title":"Buy milk"}'
 # HTTP/1.1 501 Not Implemented
 # not implemented
-
-curl -i http://localhost:8080/tasks/1
-# HTTP/1.1 501 Not Implemented
-# not implemented
 ```
 
-`GET /tasks` returns an empty JSON array `[]` (not `null`) from the store; the two stubbed routes return `501` until Chapters 20 and 21 fill them in.
+On the **start** branch `POST /tasks` still returns `501`; on the **finish** branch it returns `201` with the created task and `GET /tasks` returns the array.
 
 ```bash
 make build   # go build ./... -> compiles every package
@@ -86,7 +80,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the finish branch — a compiling skeleton. The layout is in place, `GET /tasks` returns `[]` from the in-memory store, and `POST /tasks` and `GET /tasks/{id}` return `501 Not Implemented`. `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
+> **Note:** This is the start branch — the Chapter 19 skeleton. `GET /tasks` returns `[]`, while `POST /tasks` and `GET /tasks/{id}` return `501 Not Implemented`. `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
 
 ## Contact
 
