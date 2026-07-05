@@ -12,25 +12,25 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 20-create-and-list-tasks-start
+git checkout 21-get-update-delete-task-start
 ```
 
-The start branch is the compiling skeleton from Chapter 19. The project layout is in place: `cmd/server/main.go` boots a `http.NewServeMux()` and wires the store into the task handlers, `internal/task/task.go` holds the `Task` resource, `internal/task/store.go` holds an in-memory `Store` (a `map[int]Task` guarded by a `sync.Mutex`) with a `List` method, and `internal/task/handler.go` registers the routes. `GET /tasks` already returns an empty JSON array, but `POST /tasks` and `GET /tasks/{id}` are stubs that return `501 Not Implemented`. This chapter turns the `create` stub into a working handler and gives the store a `Create` method.
+The start branch is the finish state of Chapter 20. Two endpoints work: `POST /tasks` creates a task and returns `201`, and `GET /tasks` returns the list with `200`. `GET /tasks/{id}` is still a `501 Not Implemented` stub, and there is no way to update or delete a task. The store (`internal/task/store.go`) has only `Create` and `List`. This chapter finishes CRUD on a single resource: fill in the `get` handler and add update and delete.
 
 ## Finish Branch
 
 ```bash
-git checkout 20-create-and-list-tasks-finish
+git checkout 21-get-update-delete-task-finish
 ```
 
-The finish branch has the first real endpoints working:
+The finish branch completes CRUD on a single task:
 
-- **`store.go`** — the `Store` gains a `nextID` counter and a `Create(ctx, Task) (Task, error)` method that assigns the ID, stamps `CreatedAt` with `time.Now()`, and stores the task under the mutex. `List` now takes a `context.Context` and returns `([]Task, error)` so both methods share the shape the database-backed store will need in Section 6.
-- **`handler.go`** — `create` decodes the JSON body with `json.NewDecoder`, calls `store.Create`, and returns `201 Created` with the stored task (including the server-assigned `id` and `createdAt`); a bad body returns `400`. `list` calls `store.List` and returns the array with `200`. Both handlers pass `r.Context()` down to the store. `get` is still a `501` stub — Chapter 21 fills it in.
+- **`store.go`** — a sentinel `ErrNotFound` plus `Get(ctx, id) (Task, error)`, `Update(ctx, id, Task) (Task, error)`, and `Delete(ctx, id) error`, each guarded by the mutex and each returning `ErrNotFound` when the ID is absent. `Update` is a full replace that keeps the original `ID` and `CreatedAt`.
+- **`handler.go`** — `get`, `update`, and `delete` parse the path ID with `strconv.Atoi` (bad ID → `400`), map `errors.Is(err, ErrNotFound)` → `404` and other errors → `500`, and register `GET`, `PUT`, and `DELETE` on `/tasks/{id}`. `DELETE` returns `204 No Content`.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/building-the-task-api/create-and-list-tasks)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/building-the-task-api/get-update-delete-task)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Project Layout
@@ -42,7 +42,7 @@ cmd/
 internal/
   task/
     task.go        # the Task resource (model)
-    store.go       # in-memory Store (map[int]Task + sync.Mutex)
+    store.go       # in-memory Store (map[int]Task + sync.Mutex): Create, List
     handler.go     # task HTTP handlers + writeJSON helper
 ```
 
@@ -59,16 +59,13 @@ Then in another terminal:
 ```bash
 curl -i -X POST http://localhost:8080/tasks -d '{"title":"Buy milk"}'
 # HTTP/1.1 201 Created
-# Content-Type: application/json
-# {"id":1,"title":"Buy milk","done":false,"createdAt":"2026-07-06T09:06:50.109193+10:00"}
 
 curl -i http://localhost:8080/tasks
 # HTTP/1.1 200 OK
-# Content-Type: application/json
-# [{"id":1,"title":"Buy milk","done":false,"createdAt":"2026-07-06T09:06:50.109193+10:00"}]
-```
 
-The server assigns the `id` and `createdAt`; the client only sends `title` and `description`. Input validation and a consistent JSON error shape arrive in Chapter 22, so a bad body returns a plain-text `400` for now.
+curl -i http://localhost:8080/tasks/1
+# HTTP/1.1 501 Not Implemented   <- the stub this chapter replaces
+```
 
 ```bash
 make build   # go build ./... -> compiles every package
@@ -78,7 +75,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This is the finish branch. `POST /tasks` creates a task and returns `201`, `GET /tasks` returns the list with `200`, and `GET /tasks/{id}` is still a `501` stub (Chapter 21). `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
+> **Note:** This is the start branch. `GET /tasks/{id}` still returns `501`, and there is no update or delete yet. `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
 
 ## Contact
 
