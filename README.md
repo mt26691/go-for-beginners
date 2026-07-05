@@ -32,7 +32,7 @@ The finish branch validates input and returns a consistent JSON error envelope e
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:22-validation-and-errors -->)
+[View the lesson on dalabs.academy]({URL})
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Project Layout
