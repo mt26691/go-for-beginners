@@ -35,7 +35,7 @@ The result is denser test code that covers more of the handler surface. Run `go 
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:25-table-driven-tests -->)
+[View the lesson on dalabs.academy]({URL})
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Project Layout
