@@ -23,7 +23,14 @@ The start branch is the finish state of Chapter 23: the Task API is layered into
 git checkout 24-testing-handlers-finish
 ```
 
-The finish branch adds the first tests: `internal/task/handler_test.go` exercises the HTTP handlers in-process with `net/http/httptest`, injecting a fake store through the same `TaskStore` seam so no database is needed. A `make test` target runs `go test ./...`.
+The finish branch adds the first tests. A new file, `internal/task/handler_test.go`, exercises the HTTP handlers in-process with `net/http/httptest`:
+
+- **A `fakeStore` test double** implements the `TaskStore` interface with a plain map. It is injected via `task.NewService(fakeStore)` → `task.NewHandler(svc)`, so the tests run entirely in memory with no database — the payoff of the Chapter 23 interface seam.
+- **`httptest.NewRequest` + `httptest.NewRecorder`** drive each handler through the real mux and assert on `rec.Code`, the decoded JSON body, and the `Content-Type` header.
+- **Cases covered:** `POST /tasks` valid → 201 + task, `POST /tasks` empty title → 400 + `{"error":"title is required"}`, `GET /tasks` → 200 array, `GET /tasks/{id}` found → 200, `GET /tasks/999` → 404. Each test builds a fresh `fakeStore`, so state never leaks between cases.
+- **A `make test` target** runs `go test ./...`.
+
+The tests are written as individual functions with `t.Run` subtests; Chapter 25 refactors the repetitive cases into a single table-driven test.
 
 ## Lesson
 
@@ -38,10 +45,11 @@ cmd/
     main.go        # entry point: store -> service -> handler wiring (DI), then starts the server
 internal/
   task/
-    task.go        # the Task resource (model) + Validate()
-    store.go       # in-memory Store (map[int]Task + sync.Mutex) + compile-time TaskStore assertion
-    service.go     # TaskStore interface + Service (business logic) between handlers and storage
-    handler.go     # task HTTP handlers holding a *Service + writeJSON / writeError / writeServiceError helpers
+    task.go          # the Task resource (model) + Validate()
+    store.go         # in-memory Store (map[int]Task + sync.Mutex) + compile-time TaskStore assertion
+    service.go       # TaskStore interface + Service (business logic) between handlers and storage
+    handler.go       # task HTTP handlers holding a *Service + writeJSON / writeError / writeServiceError helpers
+    handler_test.go  # httptest handler tests + a fakeStore test double (Chapter 24)
 ```
 
 ## Running the Server
@@ -59,10 +67,16 @@ make lint    # golangci-lint run -> runs the linter
 ## Running Tests
 
 ```bash
-go test ./...
+make test     # go test ./...
 ```
 
-> **Note:** This is the start branch. There are no tests yet, so `go test ./...` prints `no test files` for each package. Chapter 24 adds the first handler tests with `httptest`, and a `make test` target to run them.
+Or run `go test` directly, and add `-v` to see each named subtest:
+
+```bash
+go test ./... -v
+```
+
+> **Note:** This is the finish branch. `internal/task/handler_test.go` tests the HTTP handlers in-process with `httptest` and a fake store, so the suite runs in milliseconds without a database. `go test ./...` passes, and `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
 
 ## Contact
 
