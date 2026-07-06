@@ -15,7 +15,7 @@ This repository contains the source code for the [Go Programming for Beginners: 
 git checkout 25-table-driven-tests-start
 ```
 
-The start branch is the finish state of Chapter 24: `internal/task/handler_test.go` tests the HTTP handlers in-process with `net/http/httptest` and a `fakeStore`. The tests are written as **individual functions and `t.Run` subtests** — `TestCreateTask` (valid → 201, empty title → 400), `TestListTasks` (→ 200 array), and `TestGetTask` (found → 200, missing → 404). They pass, but the create/get cases repeat the same request/record/assert shape, and they do not yet cover a too-long title or a non-numeric id. This is the "before" that Chapter 25 refactors.
+The start branch is the finish state of Chapter 24: `internal/task/handler_test.go` tests the HTTP handlers with `httptest` and a `fakeStore`, written as **individual functions and `t.Run` subtests** that repeat the same request/record/assert shape.
 
 ## Finish Branch
 
@@ -23,7 +23,15 @@ The start branch is the finish state of Chapter 24: `internal/task/handler_test.
 git checkout 25-table-driven-tests-finish
 ```
 
-The finish branch refactors those repetitive tests into the idiomatic **table-driven** form: a slice of case structs iterated with `t.Run(tc.name, ...)`, marked `t.Parallel()`, covering **more** cases in **fewer**, denser functions.
+The finish branch refactors those repetitive tests into the idiomatic **table-driven** form. Only `internal/task/handler_test.go` changes:
+
+- **A table of cases.** `TestCreateTask` becomes a `[]struct{ name; title; wantStatus; wantError string }` iterated with `t.Run(tc.name, ...)`, so each row is one named subtest with pinpoint failure output. `TestGetTask` gets its own small table (found, non-numeric id, missing id) rather than being forced into the create table.
+- **More cases, fewer functions.** The table adds a **too-long title → 400** case and a **non-numeric id → 400** case that the individual tests never covered, while collapsing the repeated boilerplate.
+- **Good failure messages.** Every assertion reports got vs want (`t.Errorf("status = %d, want %d", ...)`) and checks the `{"error": ...}` envelope where relevant.
+- **`t.Parallel()`.** Each subtest runs in parallel on its own fresh `fakeStore`, so state never leaks. Since Go 1.22 each loop iteration gets a fresh `tc`, so the old `tc := tc` copy is no longer needed.
+- **`TestListTasks` stays a single straight-line test** — one scenario, not a family of cases, so a table would only add ceremony.
+
+The result is denser test code that covers more of the handler surface. Run `go test ./... -cover` to see the coverage figure.
 
 ## Lesson
 
@@ -42,7 +50,7 @@ internal/
     store.go         # in-memory Store (map[int]Task + sync.Mutex) + compile-time TaskStore assertion
     service.go       # TaskStore interface + Service (business logic) between handlers and storage
     handler.go       # task HTTP handlers holding a *Service + writeJSON / writeError / writeServiceError helpers
-    handler_test.go  # httptest handler tests + a fakeStore test double (individual tests, pre-refactor)
+    handler_test.go  # table-driven httptest handler tests + a fakeStore test double (Chapter 25)
 ```
 
 ## Running the Server
@@ -63,13 +71,14 @@ make lint    # golangci-lint run -> runs the linter
 make test     # go test ./...
 ```
 
-Or run `go test` directly, and add `-v` to see each named subtest:
+Or run `go test` directly, and add `-v` to see each named subtest run (in parallel), or `-cover` for the coverage figure:
 
 ```bash
 go test ./... -v
+go test ./... -cover
 ```
 
-> **Note:** This is the start branch. The handler tests already pass; they are just written as individual functions rather than as a table. Chapter 25 turns the repetitive cases into a single table-driven test.
+> **Note:** This is the finish branch. `internal/task/handler_test.go` is now table-driven and covers more cases (too-long title, non-numeric id) than Chapter 24 did. `go test ./...` passes, and `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
 
 ## Contact
 

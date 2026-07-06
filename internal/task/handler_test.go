@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -74,7 +75,7 @@ func (f *fakeStore) Delete(_ context.Context, id int) error {
 
 // newTestServer wires a fresh fake store through the real service and handler
 // and returns the mux plus the store. Each test gets its own isolated storage,
-// so state never leaks between cases.
+// so state never leaks between cases — which is what makes t.Parallel() safe.
 func newTestServer() (http.Handler, *fakeStore) {
 	store := newFakeStore()
 	svc := task.NewService(store)
@@ -105,59 +106,160 @@ func decodeInto(t *testing.T, rec *httptest.ResponseRecorder, dst any) {
 	}
 }
 
+// TestCreateTask drives POST /tasks from a table of cases. Each row is one
+// request/response scenario, and the loop turns every row into a named subtest
+// with t.Run, so a failure points at the exact case. wantError is empty when the
+// case should succeed and non-empty when it should return the JSON error
+// envelope {"error": ...}.
 func TestCreateTask(t *testing.T) {
-	t.Run("valid task returns 201 and the created task", func(t *testing.T) {
-		srv, _ := newTestServer()
+	t.Parallel()
 
-		req := jsonRequest(http.MethodPost, "/tasks", map[string]string{"title": "Buy milk"})
-		rec := httptest.NewRecorder()
-		srv.ServeHTTP(rec, req)
+	cases := []struct {
+		name       string
+		title      string
+		wantStatus int
+		wantError  string
+	}{
+		{
+			name:       "valid title returns 201",
+			title:      "Buy milk",
+			wantStatus: http.StatusCreated,
+		},
+		{
+			name:       "empty title returns 400",
+			title:      "",
+			wantStatus: http.StatusBadRequest,
+			wantError:  "title is required",
+		},
+		{
+			name:       "too-long title returns 400",
+			title:      strings.Repeat("a", task.MaxTitleLength+1),
+			wantStatus: http.StatusBadRequest,
+			wantError:  "title must be 200 characters or fewer",
+		},
+	}
 
-		if rec.Code != http.StatusCreated {
-			t.Fatalf("status = %d, want %d", rec.Code, http.StatusCreated)
-		}
-		if got := rec.Header().Get("Content-Type"); got != "application/json" {
-			t.Errorf("Content-Type = %q, want application/json", got)
-		}
+	for _, tc := range cases {
+		// Since Go 1.22 each iteration gets a fresh tc, so the old `tc := tc`
+		// copy is no longer needed to make t.Parallel() capture the right case.
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-		var got task.Task
-		decodeInto(t, rec, &got)
-		if got.Title != "Buy milk" {
-			t.Errorf("title = %q, want %q", got.Title, "Buy milk")
-		}
-		if got.ID == 0 {
-			t.Error("id = 0, want a server-assigned id")
-		}
-	})
+			srv, _ := newTestServer()
+			rec := httptest.NewRecorder()
+			srv.ServeHTTP(rec, jsonRequest(http.MethodPost, "/tasks", map[string]string{"title": tc.title}))
 
-	t.Run("empty title returns 400 and an error envelope", func(t *testing.T) {
-		srv, _ := newTestServer()
+			if rec.Code != tc.wantStatus {
+				t.Fatalf("status = %d, want %d", rec.Code, tc.wantStatus)
+			}
 
-		req := jsonRequest(http.MethodPost, "/tasks", map[string]string{"title": ""})
-		rec := httptest.NewRecorder()
-		srv.ServeHTTP(rec, req)
+			if tc.wantError != "" {
+				var got map[string]string
+				decodeInto(t, rec, &got)
+				if got["error"] != tc.wantError {
+					t.Errorf("error = %q, want %q", got["error"], tc.wantError)
+				}
+				return
+			}
 
-		if rec.Code != http.StatusBadRequest {
-			t.Fatalf("status = %d, want %d", rec.Code, http.StatusBadRequest)
-		}
-
-		var got map[string]string
-		decodeInto(t, rec, &got)
-		if got["error"] != "title is required" {
-			t.Errorf("error = %q, want %q", got["error"], "title is required")
-		}
-	})
+			var got task.Task
+			decodeInto(t, rec, &got)
+			if got.Title != tc.title {
+				t.Errorf("title = %q, want %q", got.Title, tc.title)
+			}
+			if got.ID == 0 {
+				t.Error("id = 0, want a server-assigned id")
+			}
+		})
+	}
 }
 
+// TestGetTask drives GET /tasks/{id} from its own small table. The id cases —
+// found, non-numeric, and missing — do not fit the create table, so they get a
+// second table instead of being forced into one giant one. When seed is true the
+// case creates a task first and requests its real id; otherwise it uses target.
+func TestGetTask(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name       string
+		seed       bool
+		target     string
+		wantStatus int
+		wantError  string
+	}{
+		{
+			name:       "existing id returns 200",
+			seed:       true,
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "non-numeric id returns 400",
+			target:     "/tasks/abc",
+			wantStatus: http.StatusBadRequest,
+			wantError:  "invalid task id",
+		},
+		{
+			name:       "missing id returns 404",
+			target:     "/tasks/999",
+			wantStatus: http.StatusNotFound,
+			wantError:  "task not found",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			srv, store := newTestServer()
+
+			target := tc.target
+			if tc.seed {
+				created, err := store.Create(context.Background(), task.Task{Title: "Buy milk"})
+				if err != nil {
+					t.Fatalf("seed store: %v", err)
+				}
+				target = fmt.Sprintf("/tasks/%d", created.ID)
+			}
+
+			rec := httptest.NewRecorder()
+			srv.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, target, nil))
+
+			if rec.Code != tc.wantStatus {
+				t.Fatalf("status = %d, want %d", rec.Code, tc.wantStatus)
+			}
+
+			if tc.wantError != "" {
+				var got map[string]string
+				decodeInto(t, rec, &got)
+				if got["error"] != tc.wantError {
+					t.Errorf("error = %q, want %q", got["error"], tc.wantError)
+				}
+				return
+			}
+
+			var got task.Task
+			decodeInto(t, rec, &got)
+			if got.Title != "Buy milk" {
+				t.Errorf("title = %q, want %q", got.Title, "Buy milk")
+			}
+		})
+	}
+}
+
+// TestListTasks stays a single straight-line test. It is one scenario, not a
+// family of similar cases, so a table would only add ceremony — a reminder that
+// the table pattern is for many similar cases, not every test.
 func TestListTasks(t *testing.T) {
+	t.Parallel()
+
 	srv, store := newTestServer()
 	if _, err := store.Create(context.Background(), task.Task{Title: "Buy milk"}); err != nil {
 		t.Fatalf("seed store: %v", err)
 	}
 
-	req := httptest.NewRequest(http.MethodGet, "/tasks", nil)
 	rec := httptest.NewRecorder()
-	srv.ServeHTTP(rec, req)
+	srv.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/tasks", nil))
 
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
@@ -171,46 +273,4 @@ func TestListTasks(t *testing.T) {
 	if got[0].Title != "Buy milk" {
 		t.Errorf("title = %q, want %q", got[0].Title, "Buy milk")
 	}
-}
-
-func TestGetTask(t *testing.T) {
-	t.Run("existing id returns 200 and the task", func(t *testing.T) {
-		srv, store := newTestServer()
-		created, err := store.Create(context.Background(), task.Task{Title: "Buy milk"})
-		if err != nil {
-			t.Fatalf("seed store: %v", err)
-		}
-
-		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/tasks/%d", created.ID), nil)
-		rec := httptest.NewRecorder()
-		srv.ServeHTTP(rec, req)
-
-		if rec.Code != http.StatusOK {
-			t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
-		}
-
-		var got task.Task
-		decodeInto(t, rec, &got)
-		if got.ID != created.ID {
-			t.Errorf("id = %d, want %d", got.ID, created.ID)
-		}
-	})
-
-	t.Run("missing id returns 404", func(t *testing.T) {
-		srv, _ := newTestServer()
-
-		req := httptest.NewRequest(http.MethodGet, "/tasks/999", nil)
-		rec := httptest.NewRecorder()
-		srv.ServeHTTP(rec, req)
-
-		if rec.Code != http.StatusNotFound {
-			t.Fatalf("status = %d, want %d", rec.Code, http.StatusNotFound)
-		}
-
-		var got map[string]string
-		decodeInto(t, rec, &got)
-		if got["error"] != "task not found" {
-			t.Errorf("error = %q, want %q", got["error"], "task not found")
-		}
-	})
 }
