@@ -34,7 +34,7 @@ The tests are written as individual functions with `t.Run` subtests; Chapter 25 
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:24-testing-handlers -->)
+[View the lesson on dalabs.academy]({URL})
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Project Layout
