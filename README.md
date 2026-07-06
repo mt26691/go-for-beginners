@@ -12,29 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 24-testing-handlers-start
+git checkout 25-table-driven-tests-start
 ```
 
-The start branch is the finish state of Chapter 23: the Task API is layered into `handler.go`, `service.go`, and `store.go` behind the `TaskStore` interface, wired by dependency injection in `main.go`. Everything compiles and the server runs, but there is not a single test in the project yet — `go test ./...` reports `no test files` for every package.
+The start branch is the finish state of Chapter 24: `internal/task/handler_test.go` tests the HTTP handlers in-process with `net/http/httptest` and a `fakeStore`. The tests are written as **individual functions and `t.Run` subtests** — `TestCreateTask` (valid → 201, empty title → 400), `TestListTasks` (→ 200 array), and `TestGetTask` (found → 200, missing → 404). They pass, but the create/get cases repeat the same request/record/assert shape, and they do not yet cover a too-long title or a non-numeric id. This is the "before" that Chapter 25 refactors.
 
 ## Finish Branch
 
 ```bash
-git checkout 24-testing-handlers-finish
+git checkout 25-table-driven-tests-finish
 ```
 
-The finish branch adds the first tests. A new file, `internal/task/handler_test.go`, exercises the HTTP handlers in-process with `net/http/httptest`:
-
-- **A `fakeStore` test double** implements the `TaskStore` interface with a plain map. It is injected via `task.NewService(fakeStore)` → `task.NewHandler(svc)`, so the tests run entirely in memory with no database — the payoff of the Chapter 23 interface seam.
-- **`httptest.NewRequest` + `httptest.NewRecorder`** drive each handler through the real mux and assert on `rec.Code`, the decoded JSON body, and the `Content-Type` header.
-- **Cases covered:** `POST /tasks` valid → 201 + task, `POST /tasks` empty title → 400 + `{"error":"title is required"}`, `GET /tasks` → 200 array, `GET /tasks/{id}` found → 200, `GET /tasks/999` → 404. Each test builds a fresh `fakeStore`, so state never leaks between cases.
-- **A `make test` target** runs `go test ./...`.
-
-The tests are written as individual functions with `t.Run` subtests; Chapter 25 refactors the repetitive cases into a single table-driven test.
+The finish branch refactors those repetitive tests into the idiomatic **table-driven** form: a slice of case structs iterated with `t.Run(tc.name, ...)`, marked `t.Parallel()`, covering **more** cases in **fewer**, denser functions.
 
 ## Lesson
 
-[View the lesson on dalabs.academy]({URL})
+[View the lesson on dalabs.academy](<!-- dalabs:25-table-driven-tests -->)
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Project Layout
@@ -49,7 +42,7 @@ internal/
     store.go         # in-memory Store (map[int]Task + sync.Mutex) + compile-time TaskStore assertion
     service.go       # TaskStore interface + Service (business logic) between handlers and storage
     handler.go       # task HTTP handlers holding a *Service + writeJSON / writeError / writeServiceError helpers
-    handler_test.go  # httptest handler tests + a fakeStore test double (Chapter 24)
+    handler_test.go  # httptest handler tests + a fakeStore test double (individual tests, pre-refactor)
 ```
 
 ## Running the Server
@@ -76,7 +69,7 @@ Or run `go test` directly, and add `-v` to see each named subtest:
 go test ./... -v
 ```
 
-> **Note:** This is the finish branch. `internal/task/handler_test.go` tests the HTTP handlers in-process with `httptest` and a fake store, so the suite runs in milliseconds without a database. `go test ./...` passes, and `go build ./...`, `go vet ./...`, and `golangci-lint run` are all clean.
+> **Note:** This is the start branch. The handler tests already pass; they are just written as individual functions rather than as a table. Chapter 25 turns the repetitive cases into a single table-driven test.
 
 ## Contact
 
