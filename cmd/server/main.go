@@ -19,7 +19,8 @@ func main() {
 	mux.HandleFunc("GET /ping", ping)
 
 	store := task.NewStore()
-	handler := task.NewHandler(store)
+	svc := task.NewService(store)
+	handler := task.NewHandler(svc)
 	handler.Routes(mux)
 
 	log.Println("listening on :8080")

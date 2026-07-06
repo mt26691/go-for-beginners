@@ -12,13 +12,19 @@ import (
 var ErrNotFound = errors.New("task not found")
 
 // Store is an in-memory task store: a map guarded by a mutex because each
-// HTTP request runs in its own goroutine. Chapter 23 extracts an interface
-// from it so a PostgreSQL-backed store can take its place later.
+// HTTP request runs in its own goroutine. It satisfies the TaskStore
+// interface (see the compile-time check below), so a PostgreSQL-backed store
+// can take its place later without touching the service or the handlers.
 type Store struct {
 	mu     sync.Mutex
 	tasks  map[int]Task
 	nextID int
 }
+
+// Compile-time assertion that *Store satisfies TaskStore. If a method ever
+// drifts out of sync with the interface, the build fails here instead of at
+// the call site.
+var _ TaskStore = (*Store)(nil)
 
 func NewStore() *Store {
 	return &Store{tasks: make(map[int]Task)}

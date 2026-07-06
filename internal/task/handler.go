@@ -8,12 +8,16 @@ import (
 	"strconv"
 )
 
+// Handler is the HTTP layer. It only decodes requests, calls the service, and
+// encodes responses. It depends on *Service, not on any store, so it has no
+// idea how or where tasks are stored.
 type Handler struct {
-	store *Store
+	svc *Service
 }
 
-func NewHandler(store *Store) *Handler {
-	return &Handler{store: store}
+// NewHandler injects the service the handlers will call.
+func NewHandler(svc *Service) *Handler {
+	return &Handler{svc: svc}
 }
 
 func (h *Handler) Routes(mux *http.ServeMux) {
@@ -25,9 +29,9 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 }
 
 func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
-	tasks, err := h.store.List(r.Context())
+	tasks, err := h.svc.List(r.Context())
 	if err != nil {
-		writeStoreError(w, err)
+		writeServiceError(w, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, tasks)
@@ -40,14 +44,9 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := t.Validate(); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	created, err := h.store.Create(r.Context(), t)
+	created, err := h.svc.Create(r.Context(), t)
 	if err != nil {
-		writeStoreError(w, err)
+		writeServiceError(w, err)
 		return
 	}
 
@@ -61,9 +60,9 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t, err := h.store.Get(r.Context(), id)
+	t, err := h.svc.Get(r.Context(), id)
 	if err != nil {
-		writeStoreError(w, err)
+		writeServiceError(w, err)
 		return
 	}
 
@@ -86,14 +85,9 @@ func (h *Handler) update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := t.Validate(); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	updated, err := h.store.Update(r.Context(), id, t)
+	updated, err := h.svc.Update(r.Context(), id, t)
 	if err != nil {
-		writeStoreError(w, err)
+		writeServiceError(w, err)
 		return
 	}
 
@@ -107,8 +101,8 @@ func (h *Handler) delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.store.Delete(r.Context(), id); err != nil {
-		writeStoreError(w, err)
+	if err := h.svc.Delete(r.Context(), id); err != nil {
+		writeServiceError(w, err)
 		return
 	}
 
@@ -135,14 +129,18 @@ func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, errorResponse{Error: message})
 }
 
-// writeStoreError maps a store error to the right status in one place:
-// ErrNotFound is a 404 the client caused; anything else is an unexpected 500
-// whose real cause we log server-side but never leak to the client.
-func writeStoreError(w http.ResponseWriter, err error) {
-	if errors.Is(err, ErrNotFound) {
+// writeServiceError maps an error from the service to the right status in one
+// place: a validation failure is a 400 the client caused, ErrNotFound is a 404,
+// and anything else is an unexpected 500 whose real cause we log server-side
+// but never leak to the client.
+func writeServiceError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Is(err, ErrTitleRequired), errors.Is(err, ErrTitleTooLong):
+		writeError(w, http.StatusBadRequest, err.Error())
+	case errors.Is(err, ErrNotFound):
 		writeError(w, http.StatusNotFound, "task not found")
-		return
+	default:
+		log.Printf("unexpected service error: %v", err)
+		writeError(w, http.StatusInternalServerError, "something went wrong")
 	}
-	log.Printf("unexpected store error: %v", err)
-	writeError(w, http.StatusInternalServerError, "something went wrong")
 }
