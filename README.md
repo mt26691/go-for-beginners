@@ -27,7 +27,7 @@ The finish branch adds the first tests: `internal/task/handler_test.go` exercise
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:24-testing-handlers -->)
+[View the lesson on dalabs.academy]({URL})
 <!-- After publishing, the /publish-chapter skill replaces the placeholder above with the actual URL -->
 
 ## Project Layout
