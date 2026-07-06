@@ -53,6 +53,7 @@ The `main` branch contains the final, completed version of the entire course —
 | 21 | Get, Update & Delete a Task | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/21-get-update-delete-task-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/21-get-update-delete-task-finish) |
 | 22 | Validating Requests & Returning Errors | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/22-validation-and-errors-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/22-validation-and-errors-finish) |
 | 23 | Organizing the Code: Handlers, Service & Storage | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/23-organizing-the-code-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/23-organizing-the-code-finish) |
+| 24 | Unit Testing Handlers with httptest | — | [`start`](https://github.com/mt26691/go-for-beginners/tree/24-testing-handlers-start) · [`finish`](https://github.com/mt26691/go-for-beginners/tree/24-testing-handlers-finish) |
 
 ## Contact
 
