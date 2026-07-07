@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 13-goroutines-and-concurrency-start
+git checkout 14-channels-and-waitgroup-start
 ```
 
-The start branch adds a new `concurrency.go` with `concurrencyDemo()` calling a stubbed `goroutinesDemo`, plus a new `== Concurrency ==` section in `main.go`. It compiles, vets, lints, and runs (`make run`), printing the earlier sections then a `(not implemented yet)` placeholder — ready for you to launch the goroutines.
+The start branch carries Chapter 13's `goroutinesDemo` (still using `time.Sleep`) and a stubbed `channelsDemo`. Fill in the TODOs to refactor `goroutinesDemo` onto a `sync.WaitGroup` and to implement the channel examples (or check out the finish branch).
 
 ## Finish Branch
 
 ```bash
-git checkout 13-goroutines-and-concurrency-finish
+git checkout 14-channels-and-waitgroup-finish
 ```
 
-`goroutinesDemo` launches one goroutine per worker with `go func()`, then pauses with `time.Sleep` to let them finish before returning. Because the goroutines run concurrently, their lines can print in any order. We do not have a way to *wait* for goroutines yet — Chapter 14 replaces the sleep with `sync.WaitGroup`, the proper tool.
+`goroutinesDemo` now waits with a `sync.WaitGroup`: `wg.Add(1)` before each goroutine, `defer wg.Done()` inside, and `wg.Wait()` at the end. Each goroutine writes into its own slot in a `results` slice, so the output is deterministic. `channelsDemo` sends values over an unbuffered channel (a send blocks until a receiver is ready) and then a buffered channel (sends succeed until the buffer is full).
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:13-goroutines-and-concurrency -->)
+[View the lesson on dalabs.academy](<!-- dalabs:14-channels-and-waitgroup -->)
 
 ## Running the Program
 
@@ -40,7 +40,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This chapter introduces goroutines only. Waiting is done with a short `time.Sleep`; Chapter 14 replaces it with `sync.WaitGroup` and adds channels.
+> **Note:** This chapter adds the two coordination tools — `sync.WaitGroup` (wait for goroutines) and channels (pass values between them). Shared-state safety with `sync.Mutex` comes in Chapter 15.
 
 ## Contact
 

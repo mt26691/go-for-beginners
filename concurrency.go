@@ -5,25 +5,34 @@ import (
 	"time"
 )
 
-// concurrencyDemo is a first look at Go's concurrency. This chapter covers
-// goroutines; channels and shared-state safety come in the next two chapters.
 func concurrencyDemo() {
 	goroutinesDemo()
+	channelsDemo()
 }
 
-// goroutinesDemo launches one goroutine per worker with `go func()`. The
-// goroutines run concurrently, so their lines can appear in any order. We do not
-// have a way to wait for goroutines yet, so we pause with time.Sleep to let them
-// finish. Chapter 14 replaces that pause with sync.WaitGroup, the real tool.
+// goroutinesDemo still uses time.Sleep from Chapter 13. In this chapter we
+// refactor it to wait with a sync.WaitGroup — see the TODO.
 func goroutinesDemo() {
-	fmt.Println("\n-- Goroutines --")
+	fmt.Println("\n-- Goroutines & WaitGroup --")
 
 	const workers = 4
+	// TODO: replace time.Sleep with a sync.WaitGroup. Call wg.Add(1) before each
+	// goroutine, defer wg.Done() inside it, have each goroutine write into its own
+	// slot in a results slice, then wg.Wait() and print the slots in order.
 	for i := 0; i < workers; i++ {
 		go func() {
 			fmt.Printf("  worker %d finished\n", i)
 		}()
 	}
-
 	time.Sleep(100 * time.Millisecond)
+}
+
+// channelsDemo will show a channel as a typed pipe between goroutines.
+func channelsDemo() {
+	fmt.Println("\n-- Channels --")
+
+	// TODO: make an unbuffered channel, send a few values from a goroutine, close
+	// it, and range over the channel to receive them. Then show a buffered
+	// channel that accepts a few sends without a receiver waiting.
+	fmt.Println("  (not implemented yet)")
 }
