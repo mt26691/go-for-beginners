@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // concurrencyDemo is a first look at Go's concurrency. This chapter covers
 // goroutines; channels and shared-state safety come in the next two chapters.
@@ -8,13 +11,19 @@ func concurrencyDemo() {
 	goroutinesDemo()
 }
 
-// goroutinesDemo launches a few goroutines with `go func()`. Fill in the TODO
-// (or check out the finish branch) to see them run concurrently.
+// goroutinesDemo launches one goroutine per worker with `go func()`. The
+// goroutines run concurrently, so their lines can appear in any order. We do not
+// have a way to wait for goroutines yet, so we pause with time.Sleep to let them
+// finish. Chapter 14 replaces that pause with sync.WaitGroup, the real tool.
 func goroutinesDemo() {
 	fmt.Println("\n-- Goroutines --")
 
-	// TODO: start one goroutine per worker with `go func()`, then pause briefly
-	// with time.Sleep so they finish before the function returns. (Chapter 14
-	// replaces the sleep with sync.WaitGroup, the proper tool.)
-	fmt.Println("  (not implemented yet)")
+	const workers = 4
+	for i := 0; i < workers; i++ {
+		go func() {
+			fmt.Printf("  worker %d finished\n", i)
+		}()
+	}
+
+	time.Sleep(100 * time.Millisecond)
 }
