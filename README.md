@@ -27,7 +27,7 @@ git checkout 14-channels-and-waitgroup-finish
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:14-channels-and-waitgroup -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/channels-and-waitgroup)
 
 ## Running the Program
 
