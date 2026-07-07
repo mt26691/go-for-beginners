@@ -27,7 +27,7 @@ git checkout 15-mutexes-and-race-detector-finish
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:15-mutexes-and-race-detector -->)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/mutexes-and-race-detector)
 
 ## Running the Program
 
