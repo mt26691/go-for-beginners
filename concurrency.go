@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"sync"
 )
 
 func concurrencyDemo() {
@@ -10,29 +10,66 @@ func concurrencyDemo() {
 	channelsDemo()
 }
 
-// goroutinesDemo still uses time.Sleep from Chapter 13. In this chapter we
-// refactor it to wait with a sync.WaitGroup — see the TODO.
+// goroutinesDemo launches one goroutine per worker and waits for all of them
+// with a sync.WaitGroup. Each goroutine writes into its own slot in results, so
+// no two goroutines touch the same memory, and we print the slots in order after
+// they finish for stable output.
 func goroutinesDemo() {
 	fmt.Println("\n-- Goroutines & WaitGroup --")
 
 	const workers = 4
-	// TODO: replace time.Sleep with a sync.WaitGroup. Call wg.Add(1) before each
-	// goroutine, defer wg.Done() inside it, have each goroutine write into its own
-	// slot in a results slice, then wg.Wait() and print the slots in order.
+	results := make([]string, workers)
+
+	var wg sync.WaitGroup
 	for i := 0; i < workers; i++ {
+		wg.Add(1) // count one more goroutine to wait for
 		go func() {
-			fmt.Printf("  worker %d finished\n", i)
+			defer wg.Done() // mark this goroutine done when it returns
+			results[i] = fmt.Sprintf("worker %d finished", i)
 		}()
 	}
-	time.Sleep(100 * time.Millisecond)
+
+	wg.Wait() // block until every wg.Done() has run
+
+	for _, line := range results {
+		fmt.Println("  " + line)
+	}
 }
 
-// channelsDemo will show a channel as a typed pipe between goroutines.
+// channelsDemo shows a channel as a typed pipe between goroutines. The first
+// example uses an unbuffered channel: a send blocks until a receiver is ready,
+// so the producer and main hand values over one at a time. Ranging over the
+// channel receives values until it is closed. The second example uses a buffered
+// channel, whose buffer lets a few sends complete without a receiver waiting.
 func channelsDemo() {
 	fmt.Println("\n-- Channels --")
 
-	// TODO: make an unbuffered channel, send a few values from a goroutine, close
-	// it, and range over the channel to receive them. Then show a buffered
-	// channel that accepts a few sends without a receiver waiting.
-	fmt.Println("  (not implemented yet)")
+	// Unbuffered channel: send blocks until main is ready to receive.
+	nums := make(chan int)
+	go func() {
+		for i := 1; i <= 3; i++ {
+			nums <- i // blocks until the receive below runs
+		}
+		close(nums) // tells the range loop there are no more values
+	}()
+
+	fmt.Print("  received from unbuffered channel:")
+	for n := range nums {
+		fmt.Printf(" %d", n)
+	}
+	fmt.Println()
+
+	// Buffered channel: the buffer holds 3 values, so these three sends complete
+	// without any receiver waiting. A fourth send would block until we received.
+	letters := make(chan string, 3)
+	letters <- "a"
+	letters <- "b"
+	letters <- "c"
+	close(letters)
+
+	fmt.Print("  received from buffered channel:")
+	for s := range letters {
+		fmt.Printf(" %s", s)
+	}
+	fmt.Println()
 }
