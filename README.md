@@ -27,7 +27,7 @@ git checkout 13-goroutines-and-concurrency-finish
 
 ## Lesson
 
-[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/goroutines-and-concurrency)
+[View the lesson on dalabs.academy](https://dalabs.academy/courses/go-programming-for-beginners-build-real-backend-services/go-language-foundations/goroutines)
 
 ## Running the Program
 
