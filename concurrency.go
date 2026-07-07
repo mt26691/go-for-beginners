@@ -8,6 +8,7 @@ import (
 func concurrencyDemo() {
 	goroutinesDemo()
 	channelsDemo()
+	mutexCounterDemo()
 }
 
 // goroutinesDemo launches one goroutine per worker and waits for all of them
@@ -22,35 +23,32 @@ func goroutinesDemo() {
 
 	var wg sync.WaitGroup
 	for i := 0; i < workers; i++ {
-		wg.Add(1) // count one more goroutine to wait for
+		wg.Add(1)
 		go func() {
-			defer wg.Done() // mark this goroutine done when it returns
+			defer wg.Done()
 			results[i] = fmt.Sprintf("worker %d finished", i)
 		}()
 	}
 
-	wg.Wait() // block until every wg.Done() has run
+	wg.Wait()
 
 	for _, line := range results {
 		fmt.Println("  " + line)
 	}
 }
 
-// channelsDemo shows a channel as a typed pipe between goroutines. The first
-// example uses an unbuffered channel: a send blocks until a receiver is ready,
-// so the producer and main hand values over one at a time. Ranging over the
-// channel receives values until it is closed. The second example uses a buffered
-// channel, whose buffer lets a few sends complete without a receiver waiting.
+// channelsDemo shows a channel as a typed pipe between goroutines: an unbuffered
+// channel hands values over one at a time, and a buffered channel accepts a few
+// sends without a receiver waiting.
 func channelsDemo() {
 	fmt.Println("\n-- Channels --")
 
-	// Unbuffered channel: send blocks until main is ready to receive.
 	nums := make(chan int)
 	go func() {
 		for i := 1; i <= 3; i++ {
-			nums <- i // blocks until the receive below runs
+			nums <- i
 		}
-		close(nums) // tells the range loop there are no more values
+		close(nums)
 	}()
 
 	fmt.Print("  received from unbuffered channel:")
@@ -59,8 +57,6 @@ func channelsDemo() {
 	}
 	fmt.Println()
 
-	// Buffered channel: the buffer holds 3 values, so these three sends complete
-	// without any receiver waiting. A fourth send would block until we received.
 	letters := make(chan string, 3)
 	letters <- "a"
 	letters <- "b"
@@ -72,4 +68,30 @@ func channelsDemo() {
 		fmt.Printf(" %s", s)
 	}
 	fmt.Println()
+}
+
+// SafeCounter will guard an int with a sync.Mutex so it is safe to use from many
+// goroutines at once. Fill in the TODOs (or check out the finish branch).
+type SafeCounter struct {
+	// TODO: add a sync.Mutex field (mu) and an int value field.
+}
+
+// Inc adds one to the counter while holding the lock.
+func (c *SafeCounter) Inc() {
+	// TODO: Lock, increment the value, Unlock (use defer for the Unlock).
+}
+
+// Value returns the current count while holding the lock.
+func (c *SafeCounter) Value() int {
+	// TODO: Lock, read the value, Unlock, and return it.
+	return 0
+}
+
+// mutexCounterDemo will hammer a single SafeCounter from many goroutines at once.
+func mutexCounterDemo() {
+	fmt.Println("\n-- Mutex-protected counter --")
+
+	// TODO: launch 100 goroutines that each call counter.Inc(), wait for them all
+	// with a sync.WaitGroup, then print counter.Value() — always exactly 100.
+	fmt.Println("  (not implemented yet)")
 }

@@ -12,22 +12,22 @@ This repository contains the source code for the [Go Programming for Beginners: 
 ## Start Branch
 
 ```bash
-git checkout 14-channels-and-waitgroup-start
+git checkout 15-mutexes-and-race-detector-start
 ```
 
-The start branch carries Chapter 13's `goroutinesDemo` (still using `time.Sleep`) and a stubbed `channelsDemo`. Fill in the TODOs to refactor `goroutinesDemo` onto a `sync.WaitGroup` and to implement the channel examples (or check out the finish branch).
+The start branch carries Chapter 14's `goroutinesDemo` and `channelsDemo`, plus a stubbed `SafeCounter` (empty struct, empty `Inc`/`Value`) and a stubbed `mutexCounterDemo`. Fill in the TODOs to guard the counter with a `sync.Mutex` (or check out the finish branch).
 
 ## Finish Branch
 
 ```bash
-git checkout 14-channels-and-waitgroup-finish
+git checkout 15-mutexes-and-race-detector-finish
 ```
 
-`goroutinesDemo` now waits with a `sync.WaitGroup`: `wg.Add(1)` before each goroutine, `defer wg.Done()` inside, and `wg.Wait()` at the end. Each goroutine writes into its own slot in a `results` slice, so the output is deterministic. `channelsDemo` sends values over an unbuffered channel (a send blocks until a receiver is ready) and then a buffered channel (sends succeed until the buffer is full).
+`SafeCounter` guards an `int` with a `sync.Mutex`: `Inc` and `Value` `Lock()` before touching the value and `defer Unlock()`. `mutexCounterDemo` increments one counter from 100 goroutines at once and the final total is always exactly 100. The whole program is race-free under `go run -race .`.
 
 ## Lesson
 
-[View the lesson on dalabs.academy](<!-- dalabs:14-channels-and-waitgroup -->)
+[View the lesson on dalabs.academy](<!-- dalabs:15-mutexes-and-race-detector -->)
 
 ## Running the Program
 
@@ -40,7 +40,7 @@ make lint    # golangci-lint run -> runs the linter
 make help    # list the available targets
 ```
 
-> **Note:** This chapter adds the two coordination tools — `sync.WaitGroup` (wait for goroutines) and channels (pass values between them). Shared-state safety with `sync.Mutex` comes in Chapter 15.
+> **Note:** This is the finish branch. A `sync.Mutex` keeps a shared `SafeCounter` correct under 100 concurrent goroutines (total always 100), and `go run -race .` reports no data races. This is the exact pattern that makes the in-memory task store safe later in the course.
 
 ## Contact
 
