@@ -5,6 +5,9 @@ import (
 	"sync"
 )
 
+// concurrencyDemo brings the three concurrency tools together: goroutines and a
+// WaitGroup, channels, and a mutex-protected counter. Each sub-demo waits for
+// the work it starts, so the output is the same on every run.
 func concurrencyDemo() {
 	goroutinesDemo()
 	channelsDemo()
@@ -37,9 +40,11 @@ func goroutinesDemo() {
 	}
 }
 
-// channelsDemo shows a channel as a typed pipe between goroutines: an unbuffered
-// channel hands values over one at a time, and a buffered channel accepts a few
-// sends without a receiver waiting.
+// channelsDemo shows a channel as a typed pipe between goroutines. The first
+// example uses an unbuffered channel: a send blocks until a receiver is ready,
+// so the producer and main hand values over one at a time. Ranging over the
+// channel receives values until it is closed. The second example uses a buffered
+// channel, whose buffer lets a few sends complete without a receiver waiting.
 func channelsDemo() {
 	fmt.Println("\n-- Channels --")
 
@@ -70,28 +75,50 @@ func channelsDemo() {
 	fmt.Println()
 }
 
-// SafeCounter will guard an int with a sync.Mutex so it is safe to use from many
-// goroutines at once. Fill in the TODOs (or check out the finish branch).
+// SafeCounter is a counter guarded by a sync.Mutex so it is safe to use from
+// many goroutines at once. Lock before touching the shared value and Unlock
+// after, so only one goroutine reads or writes it at a time. This is the same
+// pattern that makes the in-memory task store safe under concurrent HTTP
+// requests later in the course.
 type SafeCounter struct {
-	// TODO: add a sync.Mutex field (mu) and an int value field.
+	mu    sync.Mutex
+	value int
 }
 
 // Inc adds one to the counter while holding the lock.
 func (c *SafeCounter) Inc() {
-	// TODO: Lock, increment the value, Unlock (use defer for the Unlock).
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.value++
 }
 
 // Value returns the current count while holding the lock.
 func (c *SafeCounter) Value() int {
-	// TODO: Lock, read the value, Unlock, and return it.
-	return 0
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.value
 }
 
-// mutexCounterDemo will hammer a single SafeCounter from many goroutines at once.
+// mutexCounterDemo hammers a single SafeCounter from many goroutines at once.
+// Because every increment goes through the mutex, the final total is exact and
+// deterministic: 100 goroutines each adding one always end at 100, with no data
+// race. Without the mutex this would race and the total would vary run to run.
 func mutexCounterDemo() {
 	fmt.Println("\n-- Mutex-protected counter --")
 
-	// TODO: launch 100 goroutines that each call counter.Inc(), wait for them all
-	// with a sync.WaitGroup, then print counter.Value() — always exactly 100.
-	fmt.Println("  (not implemented yet)")
+	const goroutines = 100
+	counter := &SafeCounter{}
+
+	var wg sync.WaitGroup
+	for i := 0; i < goroutines; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			counter.Inc()
+		}()
+	}
+
+	wg.Wait()
+
+	fmt.Printf("  %d goroutines each +1 -> final total: %d\n", goroutines, counter.Value())
 }
